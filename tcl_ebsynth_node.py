@@ -3,6 +3,9 @@ from .utils import get_temp_dir
 from torchvision.utils import save_image
 import json
 import subprocess
+from glob import glob
+import torch
+import torchvision
 
 class TclEbSynth:
 
@@ -40,6 +43,14 @@ class TclEbSynth:
             assert keyframe.shape[0] == 1
             keyframe = keyframe[0,...]
         keyframe = keyframe.permute(2, 0, 1)
+
+        # Resize keyframe if its size is different than the frame size
+        aframe_path = glob(os.path.join(video_frame_folder, '*.*'))[0]
+        aframe = torchvision.io.read_image(aframe_path)
+        if aframe.shape != keyframe.shape:
+            output_size = aframe.shape[1:]
+            keyframe = torch.nn.functional.interpolate(keyframe[None,...], size=output_size)[0,...]
+
         key_frame_path = os.path.join(temp_dir, 'keyframe.png')
         save_image(keyframe, key_frame_path)
 
