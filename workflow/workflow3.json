@@ -1,53 +1,7 @@
 {
-  "last_node_id": 16,
-  "last_link_id": 16,
+  "last_node_id": 20,
+  "last_link_id": 18,
   "nodes": [
-    {
-      "id": 7,
-      "type": "TclEbSynth",
-      "pos": [
-        660,
-        290
-      ],
-      "size": {
-        "0": 393,
-        "1": 102
-      },
-      "flags": {},
-      "order": 3,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "keyframe",
-          "type": "IMAGE",
-          "link": 6
-        },
-        {
-          "name": "video_frame_folder",
-          "type": "PATH",
-          "link": 7
-        }
-      ],
-      "outputs": [
-        {
-          "name": "frame_folder",
-          "type": "PATH",
-          "links": [
-            9,
-            12
-          ],
-          "shape": 3,
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "TclEbSynth"
-      },
-      "widgets_values": [
-        0,
-        "enable"
-      ]
-    },
     {
       "id": 8,
       "type": "TclExtractFramesFromVideo",
@@ -85,78 +39,50 @@
       }
     },
     {
-      "id": 11,
-      "type": "TclFrames2Video",
+      "id": 18,
+      "type": "Combine Video",
       "pos": [
-        1084,
-        90
+        1339,
+        623
       ],
-      "size": {
-        "0": 229.20001220703125,
-        "1": 26
-      },
-      "flags": {},
-      "order": 4,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "frame_folder",
-          "type": "PATH",
-          "link": 9
-        }
+      "size": [
+        315,
+        314
       ],
-      "outputs": [
-        {
-          "name": "video",
-          "type": "IMAGE",
-          "links": [
-            10,
-            16
-          ],
-          "shape": 3,
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "TclFrames2Video"
-      }
-    },
-    {
-      "id": 14,
-      "type": "TclSaveVideoFromFrames",
-      "pos": [
-        841,
-        700
-      ],
-      "size": {
-        "0": 315,
-        "1": 98
-      },
       "flags": {},
       "order": 5,
       "mode": 0,
       "inputs": [
         {
-          "name": "frame_folder",
-          "type": "PATH",
-          "link": 12
+          "name": "images",
+          "type": "IMAGE",
+          "link": 17
         },
         {
-          "name": "video_info",
-          "type": "VHS_VIDEOINFO",
-          "link": 13
-        },
+          "name": "audio_file",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "audio_file"
+          }
+        }
+      ],
+      "outputs": [
         {
-          "name": "audio",
-          "type": "VHS_AUDIO",
-          "link": 14
+          "name": "video_file",
+          "type": "STRING",
+          "links": null,
+          "shape": 3
         }
       ],
       "properties": {
-        "Node name for S&R": "TclSaveVideoFromFrames"
+        "Node name for S&R": "Combine Video"
       },
       "widgets_values": [
-        "ebsynth_output.mp4"
+        "video\\video",
+        "",
+        24,
+        null
       ]
     },
     {
@@ -199,18 +125,14 @@
         {
           "name": "audio",
           "type": "VHS_AUDIO",
-          "links": [
-            14
-          ],
+          "links": [],
           "shape": 3,
           "slot_index": 2
         },
         {
           "name": "video_info",
           "type": "VHS_VIDEOINFO",
-          "links": [
-            13
-          ],
+          "links": [],
           "shape": 3,
           "slot_index": 3
         }
@@ -244,10 +166,92 @@
       }
     },
     {
+      "id": 11,
+      "type": "TclFrames2Video",
+      "pos": [
+        1106,
+        145
+      ],
+      "size": {
+        "0": 229.20001220703125,
+        "1": 26
+      },
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "frame_folder",
+          "type": "PATH",
+          "link": 9
+        }
+      ],
+      "outputs": [
+        {
+          "name": "video",
+          "type": "IMAGE",
+          "links": [
+            17,
+            18
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "TclFrames2Video"
+      }
+    },
+    {
+      "id": 7,
+      "type": "TclEbSynth",
+      "pos": [
+        660,
+        290
+      ],
+      "size": {
+        "0": 393,
+        "1": 102
+      },
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "keyframe",
+          "type": "IMAGE",
+          "link": 6
+        },
+        {
+          "name": "video_frame_folder",
+          "type": "PATH",
+          "link": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "frame_folder",
+          "type": "PATH",
+          "links": [
+            9
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "TclEbSynth"
+      },
+      "widgets_values": [
+        0,
+        "enable"
+      ]
+    },
+    {
       "id": 6,
       "type": "LoadImage",
       "pos": [
-        60,
+        58,
         84
       ],
       "size": {
@@ -278,68 +282,21 @@
         "Node name for S&R": "LoadImage"
       },
       "widgets_values": [
-        "033.jpg",
+        "000 (1).jpg",
         "image"
       ]
     },
     {
-      "id": 16,
-      "type": "Combine Video",
-      "pos": [
-        1365,
-        470
-      ],
-      "size": [
-        315,
-        634
-      ],
-      "flags": {},
-      "order": 7,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "images",
-          "type": "IMAGE",
-          "link": 16
-        },
-        {
-          "name": "audio_file",
-          "type": "STRING",
-          "link": null,
-          "widget": {
-            "name": "audio_file"
-          }
-        }
-      ],
-      "outputs": [
-        {
-          "name": "video_file",
-          "type": "STRING",
-          "links": null,
-          "shape": 3
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "Combine Video"
-      },
-      "widgets_values": [
-        "video\\video",
-        "",
-        24,
-        null
-      ]
-    },
-    {
-      "id": 12,
+      "id": 20,
       "type": "PreviewImage",
       "pos": [
-        1393,
-        83
+        1516,
+        178
       ],
-      "size": {
-        "0": 210,
-        "1": 246
-      },
+      "size": [
+        210,
+        246
+      ],
       "flags": {},
       "order": 6,
       "mode": 0,
@@ -347,7 +304,7 @@
         {
           "name": "images",
           "type": "IMAGE",
-          "link": 10
+          "link": 18
         }
       ],
       "properties": {
@@ -389,42 +346,18 @@
       "PATH"
     ],
     [
-      10,
+      17,
       11,
       0,
-      12,
+      18,
       0,
       "IMAGE"
     ],
     [
-      12,
-      7,
-      0,
-      14,
-      0,
-      "PATH"
-    ],
-    [
-      13,
-      1,
-      3,
-      14,
-      1,
-      "VHS_VIDEOINFO"
-    ],
-    [
-      14,
-      1,
-      2,
-      14,
-      2,
-      "VHS_AUDIO"
-    ],
-    [
-      16,
+      18,
       11,
       0,
-      16,
+      20,
       0,
       "IMAGE"
     ]
@@ -433,10 +366,10 @@
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.683013455365071,
+      "scale": 0.6830134553650709,
       "offset": [
-        17.323873632812553,
-        117.8115204687495
+        104.74093808593761,
+        23.971861093749602
       ]
     }
   },
