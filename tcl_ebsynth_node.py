@@ -15,8 +15,7 @@ class TclEbSynth:
         return {
             "required": {
                 "keyframes": ("IMAGES",),
-                "video_frame_folder1": ("PATH",),
-                "key_frame_id": ("INT", {"default": 0, "min": 0, "step": 1}),
+                "video_frame_folder": ("PATH",),
                 "gpu": (["enable", "disable"],)
             },
         }
@@ -65,7 +64,7 @@ class TclEbSynth:
         execute_ebsynth(key_frame_folder, video_frame_folder, out_frame_dir, is_gpu_on=is_gpu_on)
 
         # Delete keys directory after processing, I'm not sure if this is necessary
-        # shutil.rmtree(keys_dir)
+        shutil.rmtree(keys_dir)
 
         return (out_frame_dir,)
 
