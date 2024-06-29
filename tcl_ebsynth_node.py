@@ -14,7 +14,7 @@ class TclEbSynth:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "keyframes": ("IMAGES",),
+                "keyframes": ("IMAGE",),
                 "video_frame_folder": ("PATH",),
                 "gpu": (["enable", "disable"],)
             },
