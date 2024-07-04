@@ -5,6 +5,12 @@ import torch
 import os
 import folder_paths
 
+# Download yolo v9 files under ComfyUI/model/yolov9
+# Model weight links
+# https://github.com/ultralytics/assets/releases/download/v8.2.0/yolov9c-seg.pt
+# https://github.com/ultralytics/assets/releases/download/v8.2.0/yolov9e-seg.pt
+
+
 YOLO_FOLDER = 'yolov9'
 
 folder_paths.add_model_folder_path(YOLO_FOLDER, os.path.join(folder_paths.models_dir, YOLO_FOLDER))
