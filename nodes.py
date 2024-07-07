@@ -1,4 +1,5 @@
 from .tcl_ebsynth_node import TclEbSynth
+from .tcl_ebsynth_batch import TclEbSynthBatch
 from .tcl_extract_video_frames_node import TclExtractFramesFromVideoFile, TclExtractFramesFromVideo
 from .tcl_frames2video_node import TclFrames2Video, TclSaveVideoFromFrames
 from .tcl_yolov8 import TclYoloV8Segmentation
@@ -6,6 +7,7 @@ from .tcl_yolov9 import TclYoloV9Segmentation
 
 NODE_CLASS_MAPPINGS = {
     "TclEbSynth": TclEbSynth,
+    "TclEbSynthBatch": TclEbSynthBatch,
     "TclExtractFramesFromVideoFile": TclExtractFramesFromVideoFile,
     "TclExtractFramesFromVideo": TclExtractFramesFromVideo,
     "TclFrames2Video": TclFrames2Video,
@@ -17,6 +19,7 @@ NODE_CLASS_MAPPINGS = {
 # A dictionary that contains the friendly/humanly readable titles for the nodes
 NODE_DISPLAY_NAME_MAPPINGS = {
     "TclEbSynth": "TCL EbSynth",
+    "TclEbSynthBatch": "TCL EbSynth (Batch)",
     "TclExtractFramesFromVideoFile": "TCL Extract Frames (From File)",
     "TclExtractFramesFromVideo": "TCL Extract Frames (From Video)",
     "TclFrames2Video": "TCL Combine Frames",
