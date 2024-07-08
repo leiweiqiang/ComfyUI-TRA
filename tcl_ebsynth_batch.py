@@ -56,7 +56,7 @@ class TclEbSynthBatch:
             keyframe = keyframe.permute(2, 0, 1)
 
             # Extract base name and extension, and format to four digits
-            formatted_name = f"{int(index*10):04d}.png"
+            formatted_name = f"{int(index*10):04d}.jpg"
 
             key_frame_folder = os.path.join(keys_dir, formatted_name)
             save_image(keyframe, key_frame_folder)
@@ -89,7 +89,7 @@ def execute_ebsynth(key_frame_dir, in_frame_dir, out_frame_dir, is_gpu_on=False)
     command = [os.path.join(curdir, 'bin', 'ebsynthcmd'), 
                os.path.join(key_frame_dir, '[####].jpg'), 
                 os.path.join(in_frame_dir, '[####].jpg'), 
-                "0", str(nframes-1), str(nframes-1), 
+                "0", "0", str(nframes-1), 
                 os.path.join(out_frame_dir, '[####].jpg')]
     if is_gpu_on: command += ['-usegpu', 'on']
     result = subprocess.run(command, check=True, capture_output=True, text=True)
