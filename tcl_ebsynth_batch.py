@@ -3,6 +3,10 @@ from .utils import get_temp_dir
 from torchvision.utils import save_image
 import json
 import subprocess
+from glob import glob
+import torch
+import torchvision
+
 
 class TclEbSynthBatch:
 
@@ -54,6 +58,13 @@ class TclEbSynthBatch:
             
             # Permute keyframe to (C, H, W)
             keyframe = keyframe.permute(2, 0, 1)
+
+            # Resize keyframe if its size is different than the frame size
+            aframe_path = glob(os.path.join(video_frame_folder, '*.*'))[0]
+            aframe = torchvision.io.read_image(aframe_path)
+            if aframe.shape != keyframe.shape:
+                output_size = aframe.shape[1:]
+                keyframe = torch.nn.functional.interpolate(keyframe[None,...], size=output_size)[0,...]
 
             # Extract base name and extension, and format to four digits
             formatted_name = f"{int(index*10):04d}.jpg"
