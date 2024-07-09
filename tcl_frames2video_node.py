@@ -1,7 +1,7 @@
 import os
 from glob import glob
 import folder_paths
-
+import time
 import torch
 import torchvision
 from moviepy.editor import ImageSequenceClip
@@ -48,22 +48,23 @@ class TclSaveVideoFromFrames:
         return {
             "required": {
                 "frame_folder": ("PATH",),
-                "video_info": ("VHS_VIDEOINFO", ),
-                "filename": ("STRING", {"multiline": False, "default": "ebsynth_output.mp4"})
+                "video_info": ("VHS_VIDEOINFO", )
             },
             "optional": {
                 "audio": ("VHS_AUDIO",)
             }
         }
     
-    RETURN_TYPES = ()
+    RETURN_TYPES = ("PATH")
+    RETURN_NAMES = ("video_path")
+    
     #RETURN_NAMES = ("video",)
     #OUTPUT_IS_LIST = (True,)
     OUTPUT_NODE = True
     FUNCTION = "combine_frames_and_save"
     CATEGORY = "TCL Research America"
 
-    def combine_frames_and_save(self, frame_folder, video_info, filename, audio):
+    def combine_frames_and_save(self, frame_folder, video_info, audio):
         assert 'source_fps' in video_info
         fps = video_info['source_fps']
         # Convert frames to video
@@ -77,7 +78,9 @@ class TclSaveVideoFromFrames:
         # Save the video file
         out_dir = folder_paths.get_output_directory()
         if not os.path.exists(out_dir): os.makedirs(out_dir)
+        timestamp = int(time.time())
+        filename = f"{timestamp}.mp4"
         out_vid_path = os.path.join(out_dir, filename)
         clip.write_videofile(out_vid_path, verbose=False, logger=None)
 
-        return {}
+        return {filename, }
