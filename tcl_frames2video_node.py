@@ -83,4 +83,4 @@ class TclSaveVideoFromFrames:
         out_vid_path = os.path.join(out_dir, filename)
         clip.write_videofile(out_vid_path, verbose=False, logger=None)
 
-        return {out_vid_path, }
+        return (filename,)
