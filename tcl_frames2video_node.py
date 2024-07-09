@@ -55,8 +55,8 @@ class TclSaveVideoFromFrames:
             }
         }
     
-    RETURN_TYPES = ("PATH")
-    RETURN_NAMES = ("video_path")
+    RETURN_TYPES = ("PATH",)
+    RETURN_NAMES = ("video_path",)
     
     #RETURN_NAMES = ("video",)
     #OUTPUT_IS_LIST = (True,)
