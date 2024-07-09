@@ -1,7 +1,7 @@
 import os
 from glob import glob
 import folder_paths
-import time
+
 import torch
 import torchvision
 from moviepy.editor import ImageSequenceClip
@@ -55,8 +55,8 @@ class TclSaveVideoFromFrames:
             }
         }
     
-    RETURN_TYPES = ("PATH",)
-    RETURN_NAMES = ("video_path",)
+    RETURN_TYPES = ("PATH")
+    RETURN_NAMES = ("video_path")
     
     #RETURN_NAMES = ("video",)
     #OUTPUT_IS_LIST = (True,)
@@ -78,9 +78,9 @@ class TclSaveVideoFromFrames:
         # Save the video file
         out_dir = folder_paths.get_output_directory()
         if not os.path.exists(out_dir): os.makedirs(out_dir)
-        timestamp = int(time.time())
-        filename = f"{timestamp}.mp4"
+        first_file = os.path.basename(frame_list[0])
+        filename = os.path.splitext(first_file)[0] + '.mp4'
         out_vid_path = os.path.join(out_dir, filename)
         clip.write_videofile(out_vid_path, verbose=False, logger=None)
 
-        return (filename,)
+        return (out_vid_path, )
