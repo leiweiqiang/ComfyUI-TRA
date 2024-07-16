@@ -1,6 +1,7 @@
 import os
 from glob import glob
 import folder_paths
+from pathlib import Path
 
 import torch
 import torchvision
@@ -52,7 +53,7 @@ class TclSaveVideoFromFrames:
                 "filename": ("STRING", {"multiline": False, "default": "ebsynth_output.mp4"})
             },
             "optional": {
-                "audio": ("VHS_AUDIO",)
+                "audio": ("AUDIO",)
             }
         }
     
@@ -75,7 +76,8 @@ class TclSaveVideoFromFrames:
             clip.set_audio(audio)
         
         # Save the video file
-        out_dir = folder_paths.get_output_directory()
+        # out_dir = folder_paths.get_input_directory()
+        out_dir = Path("/mnt/sharedfolder/ebsynth_output")
         if not os.path.exists(out_dir): os.makedirs(out_dir)
         out_vid_path = os.path.join(out_dir, filename)
         clip.write_videofile(out_vid_path, verbose=False, logger=None)
