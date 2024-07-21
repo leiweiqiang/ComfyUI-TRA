@@ -36,7 +36,7 @@ class TclEbSynthBatch:
     def ebsynth(self, keyframes, video_frame_folder, gpu):
         is_gpu_on = (gpu == 'enable')
 
-        path_parts = os.path.normpath(keyframes[0]).split(os.sep)
+        path_parts = os.path.normpath(video_frame_folder).split(os.sep)
         uuid_str = path_parts[-2]
         
         # Create temp output dir

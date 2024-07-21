@@ -75,10 +75,14 @@ class TclSaveVideoFromFrames:
         # Set audio if available
         if audio is not None:
             clip.set_audio(audio)
+
+        path_parts = os.path.normpath(frame_folder).split(os.sep)
+        uuid_str = path_parts[-2]
         
         # Save the video file
         # out_dir = folder_paths.get_input_directory()
         out_dir = Path("/mnt/sharedfolder/ebsynth_output")
+        out_dir = os.path.join(out_dir, uuid_str)
         if not os.path.exists(out_dir): os.makedirs(out_dir)
         out_vid_path = os.path.join(out_dir, filename)
         clip.write_videofile(out_vid_path, verbose=False, logger=None)
