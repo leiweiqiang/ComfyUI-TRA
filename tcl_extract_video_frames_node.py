@@ -1,4 +1,5 @@
 import os
+import shutil
 import folder_paths
 from glob import glob
 import itertools
@@ -78,7 +79,7 @@ class TclExtractFramesFromVideo:
         output_dir = get_temp_dir()
         in_frame_dir = os.path.join(output_dir, 'in_frames')
         if os.path.exists(in_frame_dir):
-            os.rmdir(in_frame_dir)
+            shutil.rmtree(in_frame_dir)
         os.makedirs(in_frame_dir)
 
         # Save frames

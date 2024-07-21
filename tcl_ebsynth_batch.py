@@ -1,4 +1,5 @@
 import os
+import shutil
 from .utils import get_temp_dir
 from torchvision.utils import save_image
 import json
@@ -41,13 +42,14 @@ class TclEbSynthBatch:
         # Create keys directory
         keys_dir = os.path.join(temp_dir, 'keys')
         if os.path.exists(keys_dir):
-            os.rmdir(keys_dir)
+            shutil.rmtree(keys_dir)
+            os.rmdir(keys_dir, ignore_errors=True)
         os.makedirs(keys_dir, exist_ok=True)
 
         # Create temp output dir for processed frames
         out_frame_dir = os.path.join(temp_dir, 'output_frames')
         if os.path.exists(out_frame_dir):
-            os.rmdir(out_frame_dir)
+            shutil.rmtree(out_frame_dir)
         os.makedirs(out_frame_dir, exist_ok=True)
 
         # keyframe_names = [os.path.basename(filepath) for filepath in filenames]
