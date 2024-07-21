@@ -43,7 +43,6 @@ class TclEbSynthBatch:
         keys_dir = os.path.join(temp_dir, 'keys')
         if os.path.exists(keys_dir):
             shutil.rmtree(keys_dir)
-            os.rmdir(keys_dir, ignore_errors=True)
         os.makedirs(keys_dir, exist_ok=True)
 
         # Create temp output dir for processed frames
