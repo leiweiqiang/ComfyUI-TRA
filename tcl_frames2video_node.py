@@ -51,7 +51,7 @@ class TclSaveVideoFromFrames:
             "required": {
                 "frame_folder": ("PATH",),
                 "video_info": ("VHS_VIDEOINFO", ),
-                "filename": ("STRING", {"multiline": False, "default": ""})
+                "filename": ("STRING", {"multiline": False, "default": "ebsynth_output.mp4"})
             },
             "optional": {
                 "audio": ("AUDIO",)
@@ -69,20 +69,25 @@ class TclSaveVideoFromFrames:
         assert 'source_fps' in video_info
         fps = video_info['source_fps']
         # Convert frames to video
+        path_parts = os.path.normpath(frame_folder).split(os.sep)
+        uuid_str = path_parts[-2]
+        
+        # Create temp output dir
+        temp_dir = get_temp_dir()
+        temp_dir = os.path.join(temp_dir, uuid_str)
+
+        frame_folder = os.path.join(temp_dir, 'output_frames')
+
         frame_list = sorted(glob(os.path.join(frame_folder, '*.*')))
         clip = ImageSequenceClip(frame_list, fps=fps)
 
         # Set audio if available
         if audio is not None:
             clip.set_audio(audio)
-
-        path_parts = os.path.normpath(frame_folder).split(os.sep)
-        uuid_str = path_parts[-2]
         
         # Save the video file
         # out_dir = folder_paths.get_input_directory()
         out_dir = Path("/mnt/sharedfolder/ebsynth_output")
-        out_dir = os.path.join(out_dir, uuid_str)
         if not os.path.exists(out_dir): os.makedirs(out_dir)
         out_vid_path = os.path.join(out_dir, filename)
         clip.write_videofile(out_vid_path, verbose=False, logger=None)
