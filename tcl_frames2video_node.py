@@ -69,15 +69,6 @@ class TclSaveVideoFromFrames:
         assert 'source_fps' in video_info
         fps = video_info['source_fps']
         # Convert frames to video
-        path_parts = os.path.normpath(frame_folder).split(os.sep)
-        uuid_str = path_parts[-2]
-        
-        # Create temp output dir
-        temp_dir = get_temp_dir()
-        temp_dir = os.path.join(temp_dir, uuid_str)
-
-        frame_folder = os.path.join(temp_dir, 'output_frames')
-
         frame_list = sorted(glob(os.path.join(frame_folder, '*.*')))
         clip = ImageSequenceClip(frame_list, fps=fps)
 

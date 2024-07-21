@@ -1,5 +1,6 @@
 import os
 import shutil
+from pathlib import Path
 from .utils import get_temp_dir
 from torchvision.utils import save_image
 import json
@@ -7,6 +8,7 @@ import subprocess
 from glob import glob
 import torch
 import torchvision
+from moviepy.editor import ImageSequenceClip
 
 
 class TclEbSynthBatch:
@@ -20,8 +22,13 @@ class TclEbSynthBatch:
             "required": {
                 "keyframes": ("IMAGE",),
                 "video_frame_folder": ("PATH",),
+                "video_info": ("VHS_VIDEOINFO", ),
+                "filename": ("STRING", {"multiline": False, "default": "ebsynth_output.mp4"}),
                 "gpu": (["enable", "disable"],)
             },
+            "optional": {
+                "audio": ("AUDIO",)
+            }
         }
 
     RETURN_TYPES = ("PATH",)
@@ -33,7 +40,7 @@ class TclEbSynthBatch:
 
     CATEGORY = "TCL Research America"
 
-    def ebsynth(self, keyframes, video_frame_folder, gpu):
+    def ebsynth(self, keyframes, video_frame_folder, video_info, filename, gpu, audio):
         is_gpu_on = (gpu == 'enable')
 
         path_parts = os.path.normpath(video_frame_folder).split(os.sep)
@@ -45,10 +52,14 @@ class TclEbSynthBatch:
 
         # Create keys directory
         keys_dir = os.path.join(temp_dir, 'keys')
+        if os.path.exists(keys_dir):
+            shutil.rmtree(keys_dir)
         os.makedirs(keys_dir)
 
         # Create temp output dir for processed frames
         out_frame_dir = os.path.join(temp_dir, 'output_frames')
+        if os.path.exists(out_frame_dir):
+            shutil.rmtree(out_frame_dir)
         os.makedirs(out_frame_dir)
 
         # keyframe_names = [os.path.basename(filepath) for filepath in filenames]
@@ -83,6 +94,23 @@ class TclEbSynthBatch:
         # Delete keys directory after processing, I'm not sure if this is necessary
         # shutil.rmtree(keys_dir)
         # shutil.rmtree(video_frame_folder)
+
+        assert 'source_fps' in video_info
+        fps = video_info['source_fps']
+        # Convert frames to video
+        frame_list = sorted(glob(os.path.join(out_frame_dir, '*.*')))
+        clip = ImageSequenceClip(frame_list, fps=fps)
+
+        # Set audio if available
+        if audio is not None:
+            clip.set_audio(audio)
+        
+        # Save the video file
+        # out_dir = folder_paths.get_input_directory()
+        out_dir = Path("/mnt/sharedfolder/ebsynth_output")
+        if not os.path.exists(out_dir): os.makedirs(out_dir)
+        out_vid_path = os.path.join(out_dir, filename)
+        clip.write_videofile(out_vid_path, verbose=False, logger=None)
 
         return (out_frame_dir,)
 
