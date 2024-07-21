@@ -24,8 +24,8 @@ class TclEbSynthBatch:
             },
         }
 
-    RETURN_TYPES = ("PATH",)
-    RETURN_NAMES = ("frame_folder",)
+    RETURN_TYPES = ("PATH","STRING")
+    RETURN_NAMES = ("frame_folder","uuid_str")
 
     FUNCTION = "ebsynth"
 
@@ -83,7 +83,7 @@ class TclEbSynthBatch:
         # Delete keys directory after processing, I'm not sure if this is necessary
         # shutil.rmtree(keys_dir)
 
-        return (out_frame_dir,)
+        return (out_frame_dir, uuid_str)
 
 
 def execute_ebsynth(key_frame_dir, in_frame_dir, out_frame_dir, is_gpu_on=False):

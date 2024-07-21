@@ -51,7 +51,8 @@ class TclSaveVideoFromFrames:
             "required": {
                 "frame_folder": ("PATH",),
                 "video_info": ("VHS_VIDEOINFO", ),
-                "filename": ("STRING", {"multiline": False, "default": "ebsynth_output.mp4"})
+                "filename": ("STRING", {"multiline": False, "default": "ebsynth_output.mp4"}),
+                "uuid_str": ("STRING",)
             },
             "optional": {
                 "audio": ("AUDIO",)
@@ -65,10 +66,13 @@ class TclSaveVideoFromFrames:
     FUNCTION = "combine_frames_and_save"
     CATEGORY = "TCL Research America"
 
-    def combine_frames_and_save(self, frame_folder, video_info, filename, audio):
+    def combine_frames_and_save(self, frame_folder, video_info, filename, uuid_str, audio):
         assert 'source_fps' in video_info
         fps = video_info['source_fps']
         # Convert frames to video
+        temp_dir = get_temp_dir()
+        temp_dir = os.path.join(temp_dir, uuid_str)
+        frame_folder = os.path.join(temp_dir, 'output_frames')
         frame_list = sorted(glob(os.path.join(frame_folder, '*.*')))
         clip = ImageSequenceClip(frame_list, fps=fps)
 
