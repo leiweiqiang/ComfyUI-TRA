@@ -36,7 +36,7 @@ class TclEbSynthBatch:
     def ebsynth(self, keyframes, video_frame_folder, gpu):
         is_gpu_on = (gpu == 'enable')
 
-        path_parts = os.path.normpath(video_frame_folder).split(os.sep)
+        path_parts = os.path.normpath(keyframes).split(os.sep)
         uuid_str = path_parts[-2]
         
         # Create temp output dir
@@ -81,8 +81,8 @@ class TclEbSynthBatch:
         execute_ebsynth(keys_dir, video_frame_folder, out_frame_dir, is_gpu_on=is_gpu_on)
 
         # Delete keys directory after processing, I'm not sure if this is necessary
-        shutil.rmtree(keys_dir)
-        shutil.rmtree(video_frame_folder)
+        # shutil.rmtree(keys_dir)
+        # shutil.rmtree(video_frame_folder)
 
         return (out_frame_dir,)
 
