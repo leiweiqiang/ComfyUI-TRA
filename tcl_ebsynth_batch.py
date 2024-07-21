@@ -24,8 +24,8 @@ class TclEbSynthBatch:
             },
         }
 
-    RETURN_TYPES = ("PATH","STRING")
-    RETURN_NAMES = ("frame_folder","uuid_str")
+    RETURN_TYPES = ("PATH",)
+    RETURN_NAMES = ("frame_folder",)
 
     FUNCTION = "ebsynth"
 
@@ -45,14 +45,13 @@ class TclEbSynthBatch:
 
         # Create keys directory
         keys_dir = os.path.join(temp_dir, 'keys')
-        os.makedirs(keys_dir, exist_ok=True)
+        os.makedirs(keys_dir)
 
         # Create temp output dir for processed frames
         out_frame_dir = os.path.join(temp_dir, 'output_frames')
-        os.makedirs(out_frame_dir, exist_ok=True)
+        os.makedirs(out_frame_dir)
 
         # keyframe_names = [os.path.basename(filepath) for filepath in filenames]
-
 
         # Process each keyframe
         for index, keyframe in enumerate(keyframes):
@@ -80,10 +79,7 @@ class TclEbSynthBatch:
         # Run the ebsynth on terminal for each keyframe
         execute_ebsynth(keys_dir, video_frame_folder, out_frame_dir, is_gpu_on=is_gpu_on)
 
-        # Delete keys directory after processing, I'm not sure if this is necessary
-        # shutil.rmtree(keys_dir)
-
-        return (out_frame_dir, uuid_str)
+        return (out_frame_dir,)
 
 
 def execute_ebsynth(key_frame_dir, in_frame_dir, out_frame_dir, is_gpu_on=False):
