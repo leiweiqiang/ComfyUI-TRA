@@ -100,7 +100,7 @@ def execute_ebsynth(key_frame_dir, in_frame_dir, out_frame_dir, is_gpu_on=False)
     command = [os.path.join(curdir, 'bin', 'ebsynthcmd'), 
                os.path.join(key_frame_dir, '[####].jpg'), 
                 os.path.join(in_frame_dir, '[####].jpg'), 
-                "0", str(nframes-1), str(nframes-1), 
+                "0", "0", str(nframes-1), 
                 os.path.join(out_frame_dir, '[####].jpg')]
     if is_gpu_on: command += ['-usegpu', 'on']
     result = subprocess.run(command, check=True, capture_output=True, text=True)
