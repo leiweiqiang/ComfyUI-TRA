@@ -51,7 +51,7 @@ class TclSaveVideoFromFrames:
             "required": {
                 "frame_folder": ("PATH",),
                 "video_info": ("VHS_VIDEOINFO", ),
-                "filename": ("STRING", {"multiline": False, "default": "ebsynth_output.mp4"})
+                "filename": ("STRING", {"multiline": False, "default": ""})
             },
             "optional": {
                 "audio": ("AUDIO",)

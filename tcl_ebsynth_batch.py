@@ -53,6 +53,7 @@ class TclEbSynthBatch:
 
         # keyframe_names = [os.path.basename(filepath) for filepath in filenames]
 
+
         # Process each keyframe
         for index, keyframe in enumerate(keyframes):
             # Save keyframe image
@@ -78,6 +79,10 @@ class TclEbSynthBatch:
 
         # Run the ebsynth on terminal for each keyframe
         execute_ebsynth(keys_dir, video_frame_folder, out_frame_dir, is_gpu_on=is_gpu_on)
+
+        # Delete keys directory after processing, I'm not sure if this is necessary
+        shutil.rmtree(keys_dir)
+        shutil.rmtree(video_frame_folder)
 
         return (out_frame_dir,)
 
