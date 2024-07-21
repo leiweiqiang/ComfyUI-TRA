@@ -35,20 +35,20 @@ class TclEbSynthBatch:
 
     def ebsynth(self, keyframes, video_frame_folder, gpu):
         is_gpu_on = (gpu == 'enable')
+
+        path_parts = os.path.normpath(video_frame_folder).split(os.sep)
+        uuid_str = path_parts[-2]
         
         # Create temp output dir
         temp_dir = get_temp_dir()
+        temp_dir = os.path.join(temp_dir, uuid_str)
 
         # Create keys directory
         keys_dir = os.path.join(temp_dir, 'keys')
-        if os.path.exists(keys_dir):
-            shutil.rmtree(keys_dir)
         os.makedirs(keys_dir, exist_ok=True)
 
         # Create temp output dir for processed frames
         out_frame_dir = os.path.join(temp_dir, 'output_frames')
-        if os.path.exists(out_frame_dir):
-            shutil.rmtree(out_frame_dir)
         os.makedirs(out_frame_dir, exist_ok=True)
 
         # keyframe_names = [os.path.basename(filepath) for filepath in filenames]

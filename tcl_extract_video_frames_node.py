@@ -1,5 +1,6 @@
 import os
 import shutil
+import uuid
 import folder_paths
 from glob import glob
 import itertools
@@ -76,10 +77,11 @@ class TclExtractFramesFromVideo:
 
     def extract_frame_and_save(self, video):
         # Create temporary output frame directories
+        uuid_str = str(uuid.uuid4())
         output_dir = get_temp_dir()
+        output_dir = os.path.join(output_dir, uuid_str)
+        os.makedirs(output_dir)
         in_frame_dir = os.path.join(output_dir, 'in_frames')
-        if os.path.exists(in_frame_dir):
-            shutil.rmtree(in_frame_dir)
         os.makedirs(in_frame_dir)
 
         # Save frames
