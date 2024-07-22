@@ -32,7 +32,7 @@ class TclEbSynthBatch:
         }
 
     RETURN_TYPES = ("PATH",)
-    RETURN_NAMES = ("frame_folder",)
+    RETURN_NAMES = ("video_path",)
 
     FUNCTION = "ebsynth"
 
@@ -112,7 +112,7 @@ class TclEbSynthBatch:
         out_vid_path = os.path.join(out_dir, filename)
         clip.write_videofile(out_vid_path, verbose=False, logger=None)
 
-        return (out_frame_dir,)
+        return (out_vid_path,)
 
 
 def execute_ebsynth(key_frame_dir, in_frame_dir, out_frame_dir, is_gpu_on=False):
