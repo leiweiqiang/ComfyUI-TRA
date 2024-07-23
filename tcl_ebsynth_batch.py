@@ -52,14 +52,12 @@ class TclEbSynthBatch:
 
         # Create keys directory
         keys_dir = os.path.join(temp_dir, 'keys')
-        if os.path.exists(keys_dir):
-            shutil.rmtree(keys_dir)
+        if os.path.exists(keys_dir): shutil.rmtree(keys_dir)
         os.makedirs(keys_dir)
 
         # Create temp output dir for processed frames
         out_frame_dir = os.path.join(temp_dir, 'output_frames')
-        if os.path.exists(out_frame_dir):
-            shutil.rmtree(out_frame_dir)
+        if os.path.exists(out_frame_dir): shutil.rmtree(out_frame_dir)
         os.makedirs(out_frame_dir)
 
         # keyframe_names = [os.path.basename(filepath) for filepath in filenames]
@@ -107,7 +105,7 @@ class TclEbSynthBatch:
         
         # Save the video file
         # out_dir = folder_paths.get_input_directory()
-        out_dir = Path("/mnt/sharedfolder/ebsynth_output")
+        out_dir = Path('/mnt/sharedfolder/ebsynth_output')
         if not os.path.exists(out_dir): os.makedirs(out_dir)
         out_vid_path = os.path.join(out_dir, filename)
         clip.write_videofile(out_vid_path, verbose=False, logger=None)
@@ -134,8 +132,12 @@ def execute_ebsynth(key_frame_dir, in_frame_dir, out_frame_dir, is_gpu_on=False)
     command = [os.path.join(curdir, 'bin', 'ebsynthcmd'), 
                os.path.join(key_frame_dir, '[####].jpg'), 
                 os.path.join(in_frame_dir, '[####].jpg'), 
-                "0", "0", str(nframes-1), 
+                '0', '0', str(nframes-1), 
                 os.path.join(out_frame_dir, '[####].jpg')]
+    command += ['-synthdetail', 'high']
+    command += ['-mapping', '15.0']
+    command += ['-diversity', '1500.0']
+    command += ['-deflicker', '2.5']
     if is_gpu_on: command += ['-usegpu', 'on']
     result = subprocess.run(command, check=True, capture_output=True, text=True)
 
