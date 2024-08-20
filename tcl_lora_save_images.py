@@ -26,14 +26,7 @@ class TclLoraSaveImages:
     def process_images(self, images):
         # Define the base input directory
         base_dir = folder_paths.get_input_directory()  # Assuming this retrieves the input folder path
-        
-        # Create the 'resize_images' directory if it doesn't exist
-        resize_dir = os.path.join(base_dir, "resize_images")
-        os.makedirs(resize_dir, exist_ok=True)
-
-        # Create a unique UUID subdirectory within 'resize_images'
-        unique_dir = os.path.join(resize_dir, str(uuid.uuid4()))
-        os.makedirs(unique_dir, exist_ok=True)
+        uuid = str(uuid.uuid4())
 
         # Create a list to store the paths of the resized images
         image_paths = []
@@ -48,7 +41,7 @@ class TclLoraSaveImages:
             keyframe = keyframe.permute(2, 0, 1)
 
             # Extract base name and extension, and format to four digits
-            output_path = os.path.join(unique_dir, f"image_{index}.png")
+            output_path = os.path.join(base_dir, f"{uuid}_{index}.png")
             save_image(keyframe, output_path)
 
             # Add the image path to the list
