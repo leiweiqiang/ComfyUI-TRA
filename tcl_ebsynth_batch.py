@@ -61,6 +61,13 @@ class TclEbSynthBatch:
         os.makedirs(out_frame_dir)
 
         # keyframe_names = [os.path.basename(filepath) for filepath in filenames]
+        frame_count = len([f for f in os.listdir(video_frame_folder) if os.path.isfile(os.path.join(video_frame_folder, f))])
+        keyframe_count = len(keyframes)
+
+        assert 'source_fps' in video_info
+        fps = video_info['source_fps']
+
+        step = fps
 
 
         # Process each keyframe
@@ -81,20 +88,25 @@ class TclEbSynthBatch:
                 keyframe = torch.nn.functional.interpolate(keyframe[None,...], size=output_size)[0,...]
 
             # Extract base name and extension, and format to four digits
-            formatted_name = f"{int(index*10):04d}.jpg"
+            formatted_name = f"{int(index*step):04d}.jpg"
 
             key_frame_folder = os.path.join(keys_dir, formatted_name)
             save_image(keyframe, key_frame_folder)
 
         # Run the ebsynth on terminal for each keyframe
-        execute_ebsynth(keys_dir, video_frame_folder, out_frame_dir, is_gpu_on=is_gpu_on)
+        for index, keyframe in enumerate(keyframes):
+            execute_ebsynth(keys_dir, 
+                            video_frame_folder, 
+                            out_frame_dir, 
+                            int(index*step),
+                            int(index*step),
+                            min(int(index*step + step), frame_count) - 1, 
+                            is_gpu_on=is_gpu_on)
 
         # Delete keys directory after processing, I'm not sure if this is necessary
         # shutil.rmtree(keys_dir)
         # shutil.rmtree(video_frame_folder)
 
-        assert 'source_fps' in video_info
-        fps = video_info['source_fps']
         # Convert frames to video
         frame_list = sorted(glob(os.path.join(out_frame_dir, '*.*')))
         clip = ImageSequenceClip(frame_list, fps=fps)
@@ -113,7 +125,7 @@ class TclEbSynthBatch:
         return (out_vid_path,)
 
 
-def execute_ebsynth(key_frame_dir, in_frame_dir, out_frame_dir, is_gpu_on=False):
+def execute_ebsynth(key_frame_dir, in_frame_dir, out_frame_dir, firstframe, keyframe, lastframe ,is_gpu_on=False):
     # Get LICENSE SERVER IP
     curdir = os.path.dirname(os.path.realpath(__file__))
     with open(os.path.join(curdir, 'config.json'), 'r') as jfile:
@@ -130,9 +142,11 @@ def execute_ebsynth(key_frame_dir, in_frame_dir, out_frame_dir, is_gpu_on=False)
 
     # Prepare the command
     command = [os.path.join(curdir, 'bin', 'ebsynthcmd'), 
-               os.path.join(key_frame_dir, '[####].jpg'), 
+                os.path.join(key_frame_dir, '[####].jpg'), 
                 os.path.join(in_frame_dir, '[####].jpg'), 
-                '0', '0', str(nframes-1), 
+                str(firstframe),
+                str(keyframe), 
+                str(lastframe), 
                 os.path.join(out_frame_dir, '[####].jpg')]
     command += ['-synthdetail', 'high']
     command += ['-mapping', '15.0']
