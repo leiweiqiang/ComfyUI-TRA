@@ -7,6 +7,7 @@ from .tcl_yolov9 import TclYoloV9Segmentation
 from .tcl_lora_save_images import TclLoraSaveImages
 from .tcl_lora_gen_datasets import TclLoraGenDatasets
 from .tcl_lora_training import TclLoraTraining
+from .tcl_fresco import TclFresco
 
 NODE_CLASS_MAPPINGS = {
     "TclEbSynth": TclEbSynth,
@@ -19,7 +20,8 @@ NODE_CLASS_MAPPINGS = {
     "TclYoloV9Segmentation":TclYoloV9Segmentation,
     "TclLoraSaveImages":TclLoraSaveImages,
     "TclLoraGenDatasets":TclLoraGenDatasets,
-    "TclLoraTraining":TclLoraTraining
+    "TclLoraTraining":TclLoraTraining,
+    "TclFresco":TclFresco
 }
 
 # A dictionary that contains the friendly/humanly readable titles for the nodes
@@ -34,5 +36,6 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "TclYoloV9Segmentation": "TCL YoloV9 Segmentation",
     "TclLoraSaveImages": "TCL Lora Save Images",
     "TclLoraGenDatasets":"TCL Lora Gen Datasets",
-    "TclLoraTraining":"TCL Lora Training"
+    "TclLoraTraining":"TCL Lora Training",
+    "TclFresco":"Tcl Fresco"
 }
