@@ -1,5 +1,7 @@
 import yaml
 import subprocess
+import re
+import os
 
 class TclFresco:
 
@@ -16,14 +18,14 @@ class TclFresco:
                 "max_images": ("INT", {"default": 3, "min": 3, "max": 200}),
                 "prompt": ("STRING", {"multiline": True, "default": ""}),
                 "negative": ("STRING", {"multiline": True, "default": ""}),
-                "video_path": ("STRING", {"multiline": False, "default": "/root/workspace/FRESCO-main/data/example/video_square.mp4"}),
-                "save_path": ("STRING", {"multiline": False, "default": "/root/workspace/FRESCO-main/output888/"}),
-                "ref_img_ip_adapter": ("STRING", {"multiline": False, "default": "/root/workspace/FRESCO-main/data/example/ref_img.png"}),
+                "video_path": ("STRING", {"multiline": False, "default": "/workspace/FRESCO-main/data/example/video_square.mp4"}),
+                "save_path": ("STRING", {"multiline": False, "default": "/workspace/FRESCO-main/output888"}),
+                "ref_img_ip_adapter": ("STRING", {"multiline": False, "default": "/workspace/FRESCO-main/data/example/ref_img.png"}),
             },
         }
 
     RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("email",)
+    RETURN_NAMES = ("help",)
     FUNCTION = "fresco"
     OUTPUT_NODE = False
     CATEGORY = "TCL Research America"
@@ -32,7 +34,7 @@ class TclFresco:
         # Define the base YAML configurations
         yaml_data = {
             "kolors": {
-                "sd_path": "./model/Kolors/",
+                "sd_path": "/workspace/FRESCO-main/model/Kolors/",
                 "model_type": "kolors",
                 "guidance_scale": 7.5,
                 "use_controlnet": True,
@@ -40,8 +42,8 @@ class TclFresco:
                 "controlnet_type": "canny-kolors",
                 "controlnet_strength": 1.0,
                 "num_inference_steps": 50,
-                "video_path": "/root/workspace/FRESCO-main/data/example/video_square.mp4",
-                "save_path": "/root/workspace/FRESCO-main/output/test/kolors",
+                "video_path": "/workspace/FRESCO-main/data/example/video_square.mp4",
+                "save_path": "/workspace/FRESCO-main/output/test/kolors",
                 "mininterv": 10,
                 "maxinterv": 10,
                 "max_images": 3,
@@ -50,7 +52,7 @@ class TclFresco:
                 "batch_size": 3,
                 "ip_adapter_name": "ip_adapter_plus_general.bin",
                 "ip_adapter_scale": 0.8,
-                "ref_img_ip_adapter": "/root/workspace/FRESCO-main/data/example/ref_img.png",
+                "ref_img_ip_adapter": "/workspace/FRESCO-main/data/example/ref_img.png",
                 "use_saliency": False,
                 "end_opt_step": 45,
                 "seed": 0,
@@ -60,7 +62,7 @@ class TclFresco:
                 "strength": 0.6
             },
             "XL": {
-                "sd_path": "/root/workspace/FRESCO-main/model/checkpoints/juggernautXL_v9Rundiffusionphoto2.safetensors",
+                "sd_path": "/workspace/FRESCO-main/model/checkpoints/juggernautXL_v9Rundiffusionphoto2.safetensors",
                 "model_type": "XL",
                 "guidance_scale": 7.5,
                 "use_controlnet": True,
@@ -68,8 +70,8 @@ class TclFresco:
                 "controlnet_type": "canny-xl",
                 "controlnet_strength": 1.0,
                 "num_inference_steps": 35,
-                "video_path": "/root/workspace/FRESCO-main/data/example/video_square.mp4",
-                "save_path": "/root/workspace/FRESCO-main/output/test/XL",
+                "video_path": "/workspace/FRESCO-main/data/example/video_square.mp4",
+                "save_path": "/workspace/FRESCO-main/output/test/XL",
                 "mininterv": 10,
                 "maxinterv": 10,
                 "max_images": 3,
@@ -83,7 +85,7 @@ class TclFresco:
                 "scheduler": "DDPMScheduler",
                 "ip_adapter_name": "ip-adapter_sdxl.safetensors",
                 "ip_adapter_scale": 0.8,
-                "ref_img_ip_adapter": "/root/workspace/FRESCO-main/data/example/ref_img.png",
+                "ref_img_ip_adapter": "/workspace/FRESCO-main/data/example/ref_img.png",
                 "strength": 0.85
             }
         }
@@ -99,18 +101,18 @@ class TclFresco:
             config['prompt'] = prompt
             config['negative'] = negative
             config['video_path'] = video_path
-            config['save_path'] = save_path
+            config['save_path'] = f"/workspace/ComfyUI/output/{save_path}"
             config['ref_img_ip_adapter'] = ref_img_ip_adapter
 
         # Define the path where the config file will be saved
-        config_path = f"/root/workspace/ComfyUI/input/config_{model_type}.yaml"
+        config_path = f"/workspace/ComfyUI/input/config_{model_type}.yaml"
 
         # Save the final configuration to a YAML file
         with open(config_path, 'w') as yaml_file:
             yaml.dump(config, yaml_file)
 
         # Run the Python script using the saved config file, after activating the virtual environment
-        command = f"python /root/workspace/FRESCO-main/run_fresco_updated.py --config_path {config_path}"
-        subprocess.run(command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd="/root/workspace/FRESCO-main")
-  
+        command = f"python /workspace/FRESCO-main/run_fresco_updated.py --config_path {config_path}"
+        subprocess.run(command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd="/workspace/FRESCO-main")
+
         return ("weiqianglei@tcl.com",)
