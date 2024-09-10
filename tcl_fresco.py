@@ -112,7 +112,7 @@ class TclFresco:
             yaml.dump(config, yaml_file)
 
         # Run the Python script using the saved config file, after activating the virtual environment
-        command = f"python /workspace/FRESCO-main/run_fresco_updated.py --config_path {config_path}"
+        command = f"PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:512 python /workspace/FRESCO-main/run_fresco_updated.py --config_path {config_path} "
         subprocess.run(command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd="/workspace/FRESCO-main")
 
         return ("weiqianglei@tcl.com",)
