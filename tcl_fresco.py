@@ -1,7 +1,5 @@
 import yaml
 import subprocess
-import re
-import os
 
 class TclFresco:
 
