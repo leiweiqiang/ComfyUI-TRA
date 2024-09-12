@@ -8,6 +8,7 @@ from .tcl_lora_save_images import TclLoraSaveImages
 from .tcl_lora_gen_datasets import TclLoraGenDatasets
 from .tcl_lora_training import TclLoraTraining
 from .tcl_fresco import TclFresco
+from .tcl_exr2png import TclExr2png
 
 NODE_CLASS_MAPPINGS = {
     "TclEbSynth": TclEbSynth,
@@ -21,7 +22,8 @@ NODE_CLASS_MAPPINGS = {
     "TclLoraSaveImages":TclLoraSaveImages,
     "TclLoraGenDatasets":TclLoraGenDatasets,
     "TclLoraTraining":TclLoraTraining,
-    "TclFresco":TclFresco
+    "TclFresco":TclFresco,
+    "TclExr2png":TclExr2png
 }
 
 # A dictionary that contains the friendly/humanly readable titles for the nodes
@@ -37,5 +39,6 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "TclLoraSaveImages": "TCL Lora Save Images",
     "TclLoraGenDatasets":"TCL Lora Gen Datasets",
     "TclLoraTraining":"TCL Lora Training",
-    "TclFresco":"Tcl Fresco"
+    "TclFresco":"Tcl Fresco",
+    "TclExr2png":"Tcl Exr2png"
 }
