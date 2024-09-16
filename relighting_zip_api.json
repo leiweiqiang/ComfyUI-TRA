@@ -1,0 +1,743 @@
+{
+    "10": {
+      "inputs": {
+        "directory": [
+          "89",
+          0
+        ],
+        "image_load_cap": [
+          "89",
+          6
+        ],
+        "start_index": [
+          "89",
+          5
+        ],
+        "load_always": false
+      },
+      "class_type": "LoadImagesFromDir //Inspire",
+      "_meta": {
+        "title": "Load Image Batch From Dir (Inspire)"
+      }
+    },
+    "11": {
+      "inputs": {
+        "mask": [
+          "10",
+          1
+        ]
+      },
+      "class_type": "InvertMask",
+      "_meta": {
+        "title": "InvertMask"
+      }
+    },
+    "12": {
+      "inputs": {
+        "image": [
+          "10",
+          0
+        ]
+      },
+      "class_type": "DF_Get_image_size",
+      "_meta": {
+        "title": "Get image size"
+      }
+    },
+    "13": {
+      "inputs": {
+        "height": [
+          "12",
+          1
+        ],
+        "width": [
+          "12",
+          0
+        ],
+        "interpolation_mode": "bicubic",
+        "image": [
+          "14",
+          0
+        ]
+      },
+      "class_type": "JWImageResize",
+      "_meta": {
+        "title": "Image Resize"
+      }
+    },
+    "14": {
+      "inputs": {
+        "image": "bg_input_still.png",
+        "upload": "image"
+      },
+      "class_type": "LoadImage",
+      "_meta": {
+        "title": "Load Image"
+      }
+    },
+    "16": {
+      "inputs": {
+        "image_from": [
+          "13",
+          0
+        ],
+        "image_to": [
+          "17",
+          0
+        ],
+        "mask": [
+          "11",
+          0
+        ]
+      },
+      "class_type": "ImageCompositeFromMaskBatch+",
+      "_meta": {
+        "title": "🔧 Image Composite From Mask Batch"
+      }
+    },
+    "17": {
+      "inputs": {
+        "i_start": [
+          "89",
+          5
+        ],
+        "i_stop": [
+          "89",
+          6
+        ],
+        "inclusive": "false",
+        "images": [
+          "10",
+          0
+        ]
+      },
+      "class_type": "JWImageSequenceExtractFromBatch",
+      "_meta": {
+        "title": "Extract Image Sequence From Batch"
+      }
+    },
+    "18": {
+      "inputs": {
+        "method": "mkl",
+        "strength": 1,
+        "image_ref": [
+          "13",
+          0
+        ],
+        "image_target": [
+          "16",
+          0
+        ]
+      },
+      "class_type": "ColorMatch",
+      "_meta": {
+        "title": "Color Match"
+      }
+    },
+    "19": {
+      "inputs": {
+        "path_pattern": [
+          "89",
+          2
+        ],
+        "start_index": 0,
+        "overwrite": "true",
+        "images": [
+          "16",
+          0
+        ]
+      },
+      "class_type": "JWSaveImageSequence",
+      "_meta": {
+        "title": "Batch Save Image Sequence"
+      }
+    },
+    "25": {
+      "inputs": {
+        "text": "The most beautiful raw photo, 4k, best quality "
+      },
+      "class_type": "TextBox",
+      "_meta": {
+        "title": "Text Box"
+      }
+    },
+    "26": {
+      "inputs": {
+        "indexes": "0",
+        "images": [
+          "16",
+          0
+        ]
+      },
+      "class_type": "GetImagesFromBatchIndexed",
+      "_meta": {
+        "title": "Get Images From Batch Indexed"
+      }
+    },
+    "27": {
+      "inputs": {
+        "model": "llava-v1.5-7b-Q4_K",
+        "mm_proj": "llava-v1.5-7b-mmproj-Q4_0",
+        "prompt": "Please describe the lighting and content of this image briefly",
+        "max_tokens": 130,
+        "temperature": 0.2,
+        "image": [
+          "26",
+          0
+        ]
+      },
+      "class_type": "LlavaCaptioner",
+      "_meta": {
+        "title": "LLaVA Captioner 🌊"
+      }
+    },
+    "29": {
+      "inputs": {
+        "input_mode": "simple",
+        "lora_count": 1,
+        "lora_name_1": "add_detail.safetensors",
+        "lora_wt_1": 0.25,
+        "model_str_1": 1,
+        "clip_str_1": 1,
+        "lora_name_2": "None",
+        "lora_wt_2": 1,
+        "model_str_2": 1,
+        "clip_str_2": 1,
+        "lora_name_3": "None",
+        "lora_wt_3": 1,
+        "model_str_3": 1,
+        "clip_str_3": 1,
+        "lora_name_4": "None",
+        "lora_wt_4": 1,
+        "model_str_4": 1,
+        "clip_str_4": 1,
+        "lora_name_5": "None",
+        "lora_wt_5": 1,
+        "model_str_5": 1,
+        "clip_str_5": 1,
+        "lora_name_6": "None",
+        "lora_wt_6": 1,
+        "model_str_6": 1,
+        "clip_str_6": 1,
+        "lora_name_7": "None",
+        "lora_wt_7": 1,
+        "model_str_7": 1,
+        "clip_str_7": 1,
+        "lora_name_8": "None",
+        "lora_wt_8": 1,
+        "model_str_8": 1,
+        "clip_str_8": 1,
+        "lora_name_9": "None",
+        "lora_wt_9": 1,
+        "model_str_9": 1,
+        "clip_str_9": 1,
+        "lora_name_10": "None",
+        "lora_wt_10": 1,
+        "model_str_10": 1,
+        "clip_str_10": 1,
+        "lora_name_11": "None",
+        "lora_wt_11": 1,
+        "model_str_11": 1,
+        "clip_str_11": 1,
+        "lora_name_12": "None",
+        "lora_wt_12": 1,
+        "model_str_12": 1,
+        "clip_str_12": 1,
+        "lora_name_13": "None",
+        "lora_wt_13": 1,
+        "model_str_13": 1,
+        "clip_str_13": 1,
+        "lora_name_14": "None",
+        "lora_wt_14": 1,
+        "model_str_14": 1,
+        "clip_str_14": 1,
+        "lora_name_15": "None",
+        "lora_wt_15": 1,
+        "model_str_15": 1,
+        "clip_str_15": 1,
+        "lora_name_16": "None",
+        "lora_wt_16": 1,
+        "model_str_16": 1,
+        "clip_str_16": 1,
+        "lora_name_17": "None",
+        "lora_wt_17": 1,
+        "model_str_17": 1,
+        "clip_str_17": 1,
+        "lora_name_18": "None",
+        "lora_wt_18": 1,
+        "model_str_18": 1,
+        "clip_str_18": 1,
+        "lora_name_19": "None",
+        "lora_wt_19": 1,
+        "model_str_19": 1,
+        "clip_str_19": 1,
+        "lora_name_20": "None",
+        "lora_wt_20": 1,
+        "model_str_20": 1,
+        "clip_str_20": 1,
+        "lora_name_21": "None",
+        "lora_wt_21": 1,
+        "model_str_21": 1,
+        "clip_str_21": 1,
+        "lora_name_22": "None",
+        "lora_wt_22": 1,
+        "model_str_22": 1,
+        "clip_str_22": 1,
+        "lora_name_23": "None",
+        "lora_wt_23": 1,
+        "model_str_23": 1,
+        "clip_str_23": 1,
+        "lora_name_24": "None",
+        "lora_wt_24": 1,
+        "model_str_24": 1,
+        "clip_str_24": 1,
+        "lora_name_25": "None",
+        "lora_wt_25": 1,
+        "model_str_25": 1,
+        "clip_str_25": 1,
+        "lora_name_26": "None",
+        "lora_wt_26": 1,
+        "model_str_26": 1,
+        "clip_str_26": 1,
+        "lora_name_27": "None",
+        "lora_wt_27": 1,
+        "model_str_27": 1,
+        "clip_str_27": 1,
+        "lora_name_28": "None",
+        "lora_wt_28": 1,
+        "model_str_28": 1,
+        "clip_str_28": 1,
+        "lora_name_29": "None",
+        "lora_wt_29": 1,
+        "model_str_29": 1,
+        "clip_str_29": 1,
+        "lora_name_30": "None",
+        "lora_wt_30": 1,
+        "model_str_30": 1,
+        "clip_str_30": 1,
+        "lora_name_31": "None",
+        "lora_wt_31": 1,
+        "model_str_31": 1,
+        "clip_str_31": 1,
+        "lora_name_32": "None",
+        "lora_wt_32": 1,
+        "model_str_32": 1,
+        "clip_str_32": 1,
+        "lora_name_33": "None",
+        "lora_wt_33": 1,
+        "model_str_33": 1,
+        "clip_str_33": 1,
+        "lora_name_34": "None",
+        "lora_wt_34": 1,
+        "model_str_34": 1,
+        "clip_str_34": 1,
+        "lora_name_35": "None",
+        "lora_wt_35": 1,
+        "model_str_35": 1,
+        "clip_str_35": 1,
+        "lora_name_36": "None",
+        "lora_wt_36": 1,
+        "model_str_36": 1,
+        "clip_str_36": 1,
+        "lora_name_37": "None",
+        "lora_wt_37": 1,
+        "model_str_37": 1,
+        "clip_str_37": 1,
+        "lora_name_38": "None",
+        "lora_wt_38": 1,
+        "model_str_38": 1,
+        "clip_str_38": 1,
+        "lora_name_39": "None",
+        "lora_wt_39": 1,
+        "model_str_39": 1,
+        "clip_str_39": 1,
+        "lora_name_40": "None",
+        "lora_wt_40": 1,
+        "model_str_40": 1,
+        "clip_str_40": 1,
+        "lora_name_41": "None",
+        "lora_wt_41": 1,
+        "model_str_41": 1,
+        "clip_str_41": 1,
+        "lora_name_42": "None",
+        "lora_wt_42": 1,
+        "model_str_42": 1,
+        "clip_str_42": 1,
+        "lora_name_43": "None",
+        "lora_wt_43": 1,
+        "model_str_43": 1,
+        "clip_str_43": 1,
+        "lora_name_44": "None",
+        "lora_wt_44": 1,
+        "model_str_44": 1,
+        "clip_str_44": 1,
+        "lora_name_45": "None",
+        "lora_wt_45": 1,
+        "model_str_45": 1,
+        "clip_str_45": 1,
+        "lora_name_46": "None",
+        "lora_wt_46": 1,
+        "model_str_46": 1,
+        "clip_str_46": 1,
+        "lora_name_47": "None",
+        "lora_wt_47": 1,
+        "model_str_47": 1,
+        "clip_str_47": 1,
+        "lora_name_48": "None",
+        "lora_wt_48": 1,
+        "model_str_48": 1,
+        "clip_str_48": 1,
+        "lora_name_49": "None",
+        "lora_wt_49": 1,
+        "model_str_49": 1,
+        "clip_str_49": 1
+      },
+      "class_type": "LoRA Stacker",
+      "_meta": {
+        "title": "LoRA Stacker"
+      }
+    },
+    "30": {
+      "inputs": {
+        "ckpt_name": "juggernaut_aftermath.safetensors",
+        "vae_name": "Baked VAE",
+        "clip_skip": -2,
+        "lora_name": "AnimateLCM_sd15_t2v_lora.safetensors",
+        "lora_model_strength": 1,
+        "lora_clip_strength": 1,
+        "positive": [
+          "44",
+          0
+        ],
+        "negative": "((beard)), embedding:ERA09NEGV2, embedding:bad-hands-5",
+        "token_normalization": "none",
+        "weight_interpretation": "comfy",
+        "empty_latent_width": 512,
+        "empty_latent_height": 512,
+        "batch_size": 1,
+        "lora_stack": [
+          "29",
+          0
+        ]
+      },
+      "class_type": "Efficient Loader",
+      "_meta": {
+        "title": "Efficient Loader"
+      }
+    },
+    "32": {
+      "inputs": {
+        "preset": "STANDARD (medium strength)",
+        "model": [
+          "30",
+          0
+        ]
+      },
+      "class_type": "IPAdapterUnifiedLoader",
+      "_meta": {
+        "title": "IPAdapter Unified Loader"
+      }
+    },
+    "33": {
+      "inputs": {
+        "model_name": "sd15_t2v_beta.ckpt",
+        "beta_schedule": "sqrt_linear (AnimateDiff)",
+        "model": [
+          "32",
+          0
+        ],
+        "context_options": [
+          "35",
+          0
+        ],
+        "sample_settings": [
+          "36",
+          0
+        ]
+      },
+      "class_type": "ADE_AnimateDiffLoaderGen1",
+      "_meta": {
+        "title": "AnimateDiff Loader 🎭🅐🅓①"
+      }
+    },
+    "35": {
+      "inputs": {
+        "context_length": 16,
+        "context_overlap": 4,
+        "fuse_method": "pyramid",
+        "use_on_equal_length": false,
+        "start_percent": 0,
+        "guarantee_steps": 1
+      },
+      "class_type": "ADE_StandardStaticContextOptions",
+      "_meta": {
+        "title": "Context Options◆Standard Static 🎭🅐🅓"
+      }
+    },
+    "36": {
+      "inputs": {
+        "batch_offset": 0,
+        "noise_type": "FreeNoise",
+        "seed_gen": "comfy",
+        "seed_offset": 0,
+        "adapt_denoise_steps": false
+      },
+      "class_type": "ADE_AnimateDiffSamplingSettings",
+      "_meta": {
+        "title": "Sample Settings 🎭🅐🅓"
+      }
+    },
+    "37": {
+      "inputs": {
+        "pixels": [
+          "16",
+          0
+        ],
+        "vae": [
+          "30",
+          4
+        ]
+      },
+      "class_type": "VAEEncode",
+      "_meta": {
+        "title": "VAE Encode"
+      }
+    },
+    "41": {
+      "inputs": {
+        "control_net_name": "control_v11f1e_sd15_tile_fp16.safetensors",
+        "tk_optional": [
+          "43",
+          1
+        ]
+      },
+      "class_type": "ControlNetLoaderAdvanced",
+      "_meta": {
+        "title": "Load Advanced ControlNet Model 🛂🅐🅒🅝"
+      }
+    },
+    "43": {
+      "inputs": {
+        "base_multiplier": 0.825,
+        "uncond_multiplier": 1
+      },
+      "class_type": "ACN_ScaledSoftControlNetWeights",
+      "_meta": {
+        "title": "Scaled Soft Weights 🛂🅐🅒🅝"
+      }
+    },
+    "44": {
+      "inputs": {
+        "delimiter": "",
+        "clean_whitespace": "false",
+        "text_a": [
+          "25",
+          0
+        ],
+        "text_b": [
+          "27",
+          0
+        ]
+      },
+      "class_type": "Text Concatenate",
+      "_meta": {
+        "title": "Text Concatenate"
+      }
+    },
+    "45": {
+      "inputs": {
+        "text": [
+          "44",
+          0
+        ],
+        "text2": "The most beautiful raw photo, 4k, best quality The image features a woman sitting at a dining table in a restaurant. She is holding a piece of paper, possibly a menu, and appears to be reading it. The restaurant has several chairs and dining tables, and there are multiple wine glasses and cups placed on the tables. The setting suggests a relaxed and social atmosphere, with people enjoying their time in the restaurant."
+      },
+      "class_type": "ShowText|pysssss",
+      "_meta": {
+        "title": "Show Text 🐍"
+      }
+    },
+    "47": {
+      "inputs": {
+        "strength": 0.6,
+        "start_percent": 0,
+        "end_percent": 1,
+        "positive": [
+          "30",
+          1
+        ],
+        "negative": [
+          "30",
+          2
+        ],
+        "control_net": [
+          "41",
+          0
+        ],
+        "image": [
+          "16",
+          0
+        ]
+      },
+      "class_type": "ACN_AdvancedControlNetApply",
+      "_meta": {
+        "title": "Apply Advanced ControlNet 🛂🅐🅒🅝"
+      }
+    },
+    "49": {
+      "inputs": {
+        "seed": [
+          "51",
+          0
+        ],
+        "steps": 8,
+        "cfg": 1.5,
+        "sampler_name": "lcm",
+        "scheduler": "sgm_uniform",
+        "denoise": 0.5,
+        "preview_method": "auto",
+        "vae_decode": "true",
+        "model": [
+          "50",
+          0
+        ],
+        "positive": [
+          "47",
+          0
+        ],
+        "negative": [
+          "47",
+          1
+        ],
+        "latent_image": [
+          "37",
+          0
+        ],
+        "optional_vae": [
+          "30",
+          4
+        ]
+      },
+      "class_type": "KSampler (Efficient)",
+      "_meta": {
+        "title": "KSampler (Efficient)"
+      }
+    },
+    "50": {
+      "inputs": {
+        "block_number": 5,
+        "downscale_factor": 2,
+        "start_percent": 0,
+        "end_percent": 0.35,
+        "downscale_after_skip": true,
+        "downscale_method": "bicubic",
+        "upscale_method": "bicubic",
+        "model": [
+          "33",
+          0
+        ]
+      },
+      "class_type": "PatchModelAddDownscale",
+      "_meta": {
+        "title": "PatchModelAddDownscale (Kohya Deep Shrink)"
+      }
+    },
+    "51": {
+      "inputs": {
+        "seed": 895956692258117
+      },
+      "class_type": "Seed (rgthree)",
+      "_meta": {
+        "title": "Seed (rgthree)"
+      }
+    },
+    "52": {
+      "inputs": {
+        "path_pattern": [
+          "89",
+          4
+        ],
+        "start_index": 0,
+        "overwrite": "true",
+        "images": [
+          "49",
+          5
+        ]
+      },
+      "class_type": "JWSaveImageSequence",
+      "_meta": {
+        "title": "Batch Save Image Sequence"
+      }
+    },
+    "78": {
+      "inputs": {
+        "text": [
+          "89",
+          0
+        ],
+        "text2": "./output/png_094317ad-d9c7-428a-8385-b6a5c9594749"
+      },
+      "class_type": "ShowText|pysssss",
+      "_meta": {
+        "title": "Show Text 🐍"
+      }
+    },
+    "79": {
+      "inputs": {
+        "png_dir": [
+          "89",
+          0
+        ],
+        "slapcomp_dir": [
+          "89",
+          1
+        ],
+        "relighting_dir": [
+          "89",
+          3
+        ],
+        "images": [
+          "49",
+          5
+        ]
+      },
+      "class_type": "TclRelightingZip",
+      "_meta": {
+        "title": "Tcl Relighting Zip"
+      }
+    },
+    "80": {
+      "inputs": {
+        "text": "{\"output\": \"413bdc91-f209-4ad8-8769-c9ae0eece53d.zip\"}",
+        "anything": [
+          "79",
+          0
+        ]
+      },
+      "class_type": "easy showAnything",
+      "_meta": {
+        "title": "Show Any"
+      }
+    },
+    "86": {
+      "inputs": {
+        "text": "[     {         \"filename\": \"sample.1001.exr\",         \"subfolder\": \"\",         \"type\": \"input\"     },     {         \"filename\": \"sample.1002.exr\",         \"subfolder\": \"\",         \"type\": \"input\"     },     {         \"filename\": \"sample.1003.exr\",         \"subfolder\": \"\",         \"type\": \"input\"     },     {         \"filename\": \"sample.1004.exr\",         \"subfolder\": \"\",         \"type\": \"input\"     },     {         \"filename\": \"sample.1005.exr\",         \"subfolder\": \"\",         \"type\": \"input\"     },     {         \"filename\": \"sample.1006.exr\",         \"subfolder\": \"\",         \"type\": \"input\"     },     {         \"filename\": \"sample.1007.exr\",         \"subfolder\": \"\",         \"type\": \"input\"     },     {         \"filename\": \"sample.1008.exr\",         \"subfolder\": \"\",         \"type\": \"input\"     },     {         \"filename\": \"sample.1009.exr\",         \"subfolder\": \"\",         \"type\": \"input\"     },     {         \"filename\": \"sample.1010.exr\",         \"subfolder\": \"\",         \"type\": \"input\"     },     {         \"filename\": \"sample.1011.exr\",         \"subfolder\": \"\",         \"type\": \"input\"     },     {         \"filename\": \"sample.1012.exr\",         \"subfolder\": \"\",         \"type\": \"input\"     },     {         \"filename\": \"sample.1013.exr\",         \"subfolder\": \"\",         \"type\": \"input\"     },     {         \"filename\": \"sample.1014.exr\",         \"subfolder\": \"\",         \"type\": \"input\"     },     {         \"filename\": \"sample.1015.exr\",         \"subfolder\": \"\",         \"type\": \"input\"     } ]"
+      },
+      "class_type": "JWString",
+      "_meta": {
+        "title": "String"
+      }
+    },
+    "89": {
+      "inputs": {
+        "keyframes": [
+          "86",
+          0
+        ]
+      },
+      "class_type": "TclRelightingApi",
+      "_meta": {
+        "title": "Tcl Relighting Api"
+      }
+    }
+  }

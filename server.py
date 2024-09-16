@@ -3,6 +3,7 @@ import sys
 import asyncio
 import traceback
 import uuid
+from aiohttp_swagger import setup_swagger
 
 import nodes
 import folder_paths
@@ -32,6 +33,7 @@ from model_filemanager import download_model, DownloadModelStatus
 from typing import Optional
 from api_server.routes.internal.internal_routes import InternalRoutes
 
+from greenscreen_utils import greenscreen_removal
 
 
 class BinaryEventTypes:
@@ -262,90 +264,143 @@ class PromptServer():
             post = await request.post()
             return image_upload(post) 
 
-        @routes.post("/upload/ext2png")
+        @routes.post("/nuke/upload")
+        async def upload_image(request):
+            post = await request.post()
+            return image_upload(post)     
+
+        @routes.post("/nuke/ext2png")
         async def exr2png(request):
             try:
-                # 解析请求体中的 JSON 数据
                 data = await request.json()
                 if not isinstance(data, list):
                     return web.Response(text="Invalid input, expecting a list", status=400)
 
-                results = []
+                folder_uuid = uuid.uuid4().hex   
+
+                output = []
                 for item in data:
                     filename = item.get("filename")
                     subfolder = item.get("subfolder")
                     file_type = item.get("type")
-
-                    # 验证字段是否存在
-                    # if not filename or not subfolder or not file_type:
                     if not filename:
                         return web.Response(text="Missing required fields", status=400)
-
-                    # 调用本地 /prompt API
-                    json_data = {
-                        "client_id": str(uuid.uuid4()),
-                        "prompt": {
-                            "1": {
-                                "inputs": {
-                                    "filename": filename,
-                                    "subfolder": ""
-                                },
-                                "class_type": "TclExr2png",
-                                "_meta": {
-                                    "title": "Tcl Exr2png"
-                                }
-                            },
-                            "2": {
-                                "inputs": {
-                                "anything": [
-                                    "1",
-                                    0
-                                ]
-                                },
-                                "class_type": "easy showAnything",
-                                "_meta": {
-                                    "title": "Show Any"
-                                }
-                            }
-                        }
-                        # "filename": filename,
-                        # "subfolder": subfolder,
-                        # "type": file_type
-                    }
-
-                if "number" in json_data:
-                    number = float(json_data['number'])
-                else:
-                    number = self.number
-                    if "front" in json_data:
-                        if json_data['front']:
-                            number = -number
-
-                    self.number += 1
-
-                if "prompt" in json_data:
-                    prompt = json_data["prompt"]
-                    valid = execution.validate_prompt(prompt)
-                    extra_data = {}
-                    if "extra_data" in json_data:
-                        extra_data = json_data["extra_data"]
-
-                    if "client_id" in json_data:
-                        extra_data["client_id"] = json_data["client_id"]
-                    if valid[0]:
-                        prompt_id = str(uuid.uuid4())
-                        outputs_to_execute = valid[2]
-                        self.prompt_queue.put((number, prompt_id, prompt, extra_data, outputs_to_execute))
-                        response = {"prompt_id": prompt_id, "number": number, "node_errors": valid[3]}
-                        return web.json_response(response)
-                    else:
-                        logging.warning("invalid prompt: {}".format(valid[1]))
-                        return web.json_response({"error": valid[1], "node_errors": valid[3]}, status=400)
-                else:
-                    return web.json_response({"error": "no prompt", "node_errors": []}, status=400)
-
+                    result = greenscreen_removal(filename, folder_uuid)
+                    logging.info(result)
+                    output.append(result) 
+                
+                return web.json_response([item["alpha"] for item in output])
+   
             except Exception as e:
                 return web.Response(text=f"An error occurred: {str(e)}", status=500)
+
+        @routes.get("/nuke/{prompt_id}")
+        async def get_history(request):
+            prompt_id = request.match_info.get("prompt_id", None)
+            
+            try:
+                # Get the history data directly from the prompt queue
+                history = self.prompt_queue.get_history(prompt_id=prompt_id)
+
+                # Check if the prompt_id exists in the history data
+                if prompt_id in history:
+                    status = history[prompt_id]["status"]["status_str"]
+                    
+                    # If the status is 'success', return the output text
+                    if status == "success":
+                        return web.json_response({"result": history[prompt_id]["outputs"]["2"]["text"][0]})
+                    else:
+                        return web.json_response({"status": status})
+                else:
+                    return web.json_response({"error": f"Prompt ID '{prompt_id}' not found"}, status=404)
+            
+            except KeyError as e:
+                return web.json_response({"error": f"Key not found: {str(e)}"}, status=400)
+            except Exception as e:
+                return web.json_response({"error": f"Unexpected error: {str(e)}"}, status=500)
+
+        @routes.get("/nuke/download")
+        async def view_image(request):
+            if "filename" in request.rel_url.query:
+                filename = request.rel_url.query["filename"]
+                filename,output_dir = folder_paths.annotated_filepath(filename)
+
+                # validation for security: prevent accessing arbitrary path
+                if filename[0] == '/' or '..' in filename:
+                    return web.Response(status=400)
+
+                if output_dir is None:
+                    type = request.rel_url.query.get("type", "output")
+                    output_dir = folder_paths.get_directory_by_type(type)
+
+                if output_dir is None:
+                    return web.Response(status=400)
+
+                if "subfolder" in request.rel_url.query:
+                    full_output_dir = os.path.join(output_dir, request.rel_url.query["subfolder"])
+                    if os.path.commonpath((os.path.abspath(full_output_dir), output_dir)) != output_dir:
+                        return web.Response(status=403)
+                    output_dir = full_output_dir
+
+                filename = os.path.basename(filename)
+                file = os.path.join(output_dir, filename)
+
+                return web.FileResponse(file, headers={"Content-Disposition": f"filename=\"{filename}\""})
+
+            return web.Response(status=404)        
+
+        @routes.post("/nuke/async_ext2png")
+        async def async_ext2png(request):
+            try:
+                data = await request.json()
+                if not isinstance(data, list):
+                    return web.Response(text="Invalid input, expecting a list", status=400)
+
+                with open('relighting_zip_api.json', 'r', encoding='utf-8') as json_file:
+                    relighting_zip_api = json.load(json_file)
+
+                    relighting_zip_api["86"]["inputs"]["text"] = json.dumps(data)    
+
+                    json_data = {
+                        "client_id": str(uuid.uuid4()),
+                        "prompt": relighting_zip_api
+                    }
+
+                    logging.info(json_data)
+
+                    if "number" in json_data:
+                        number = float(json_data['number'])
+                    else:
+                        number = self.number
+                        if "front" in json_data:
+                            if json_data['front']:
+                                number = -number
+
+                        self.number += 1
+
+                    if "prompt" in json_data:
+                        prompt = json_data["prompt"]
+                        valid = execution.validate_prompt(prompt)
+                        extra_data = {}
+                        if "extra_data" in json_data:
+                            extra_data = json_data["extra_data"]
+
+                        if "client_id" in json_data:
+                            extra_data["client_id"] = json_data["client_id"]
+                        if valid[0]:
+                            prompt_id = str(uuid.uuid4())
+                            outputs_to_execute = valid[2]
+                            self.prompt_queue.put((number, prompt_id, prompt, extra_data, outputs_to_execute))
+                            response = {"prompt_id": prompt_id, "number": number, "node_errors": valid[3]}
+                            return web.json_response(response)
+                        else:
+                            logging.warning("invalid prompt: {}".format(valid[1]))
+                            return web.json_response({"error": valid[1], "node_errors": valid[3]}, status=400)
+                    else:
+                        return web.json_response({"error": "no prompt", "node_errors": []}, status=400)
+
+            except Exception as e:
+                return web.Response(text=f"An error occurred: {str(e)}", status=500)                
                 
         @routes.post("/upload/mask")
         async def upload_mask(request):
@@ -728,13 +783,16 @@ class PromptServer():
         # Currently both the old endpoints without prefix and new endpoints with
         # prefix are supported.
         api_routes = web.RouteTableDef()
+
         for route in self.routes:
             # Custom nodes might add extra static routes. Only process non-static
             # routes to add /api prefix.
             if isinstance(route, web.RouteDef):
                 api_routes.route(route.method, "/api" + route.path)(route.handler, **route.kwargs)
         self.app.add_routes(api_routes)
+        setup_swagger(self.app, swagger_url="/api/doc", ui_version=3)
         self.app.add_routes(self.routes)
+
 
         for name, dir in nodes.EXTENSION_WEB_DIRS.items():
             self.app.add_routes([
@@ -744,6 +802,9 @@ class PromptServer():
         self.app.add_routes([
             web.static('/', self.web_root),
         ])
+
+
+        
 
     def get_queue_info(self):
         prompt_info = {}
