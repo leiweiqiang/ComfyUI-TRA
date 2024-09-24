@@ -3,8 +3,6 @@ import sys
 import asyncio
 import traceback
 import uuid
-from aiohttp_swagger import setup_swagger
-
 import nodes
 import folder_paths
 import execution
@@ -14,6 +12,7 @@ import json
 import glob
 import struct
 import ssl
+
 from PIL import Image, ImageOps
 from PIL.PngImagePlugin import PngInfo
 from io import BytesIO
@@ -264,12 +263,12 @@ class PromptServer():
             post = await request.post()
             return image_upload(post) 
 
-        @routes.post("/nuke/upload")
+        @routes.post("/api/nuke/upload")
         async def upload_image(request):
             post = await request.post()
             return image_upload(post)     
 
-        @routes.post("/nuke/ext2png")
+        @routes.post("/api/nuke/ext2png")
         async def exr2png(request):
             try:
                 data = await request.json()
@@ -286,7 +285,6 @@ class PromptServer():
                     if not filename:
                         return web.Response(text="Missing required fields", status=400)
                     result = greenscreen_removal(filename, folder_uuid)
-                    logging.info(result)
                     output.append(result) 
                 
                 return web.json_response([item["alpha"] for item in output])
@@ -294,8 +292,17 @@ class PromptServer():
             except Exception as e:
                 return web.Response(text=f"An error occurred: {str(e)}", status=500)
 
-        @routes.get("/nuke/{prompt_id}")
+        @routes.get("/api/nuke/version")
         async def get_history(request):
+            return web.json_response({
+                "version": "1.0.0",
+                "release_date": "2024-09-16"
+            })
+
+        @routes.get("/api/nuke/{prompt_id}")
+        async def get_history(request):
+            # prompt_id = request.match_info.get("prompt_id", None)
+            # return web.json_response(self.prompt_queue.get_history(prompt_id=prompt_id))
             prompt_id = request.match_info.get("prompt_id", None)
             
             try:
@@ -308,18 +315,30 @@ class PromptServer():
                     
                     # If the status is 'success', return the output text
                     if status == "success":
-                        return web.json_response({"result": history[prompt_id]["outputs"]["2"]["text"][0]})
+                        return web.json_response({
+                            "status": "completed",
+                            "prompt_id": prompt_id,
+                            "result": history[prompt_id]["outputs"]["80"]["text"][0]})
                     else:
                         return web.json_response({"status": status})
                 else:
-                    return web.json_response({"error": f"Prompt ID '{prompt_id}' not found"}, status=404)
+                    return web.json_response({
+                        "status": "pending",
+                        "prompt_id": prompt_id
+                    }, status=200)
             
             except KeyError as e:
-                return web.json_response({"error": f"Key not found: {str(e)}"}, status=400)
+                return web.json_response({
+                    "status": "failed",
+                    "prompt_id": prompt_id,
+                    "error": f"Key not found: {str(e)}"}, status=400)
             except Exception as e:
-                return web.json_response({"error": f"Unexpected error: {str(e)}"}, status=500)
+                return web.json_response({
+                    "status": "failed",
+                    "prompt_id": prompt_id,
+                    "error": f"Unexpected error: {str(e)}"}, status=500)
 
-        @routes.get("/nuke/download")
+        @routes.get("/api/nuke/download")
         async def view_image(request):
             if "filename" in request.rel_url.query:
                 filename = request.rel_url.query["filename"]
@@ -347,9 +366,62 @@ class PromptServer():
 
                 return web.FileResponse(file, headers={"Content-Disposition": f"filename=\"{filename}\""})
 
-            return web.Response(status=404)        
+            return web.Response(status=404) 
 
-        @routes.post("/nuke/async_ext2png")
+
+        @routes.post("/api/nuke/relighting")
+        async def relighting(request):
+            try:
+                data = await request.json()
+                logging.info(data)
+
+                with open('relighting_zip_api.json', 'r', encoding='utf-8') as json_file:
+                    relighting_zip_api = json.load(json_file)
+                    relighting_zip_api["95"]["inputs"]["input_path"] = data["input_dir"]    
+                    logging.info(relighting_zip_api["95"])
+                    json_data = {
+                        "client_id": str(uuid.uuid4()),
+                        "prompt": relighting_zip_api
+                    }
+
+            
+
+                    if "number" in json_data:
+                        number = float(json_data['number'])
+                    else:
+                        number = self.number
+                        if "front" in json_data:
+                            if json_data['front']:
+                                number = -number
+
+                        self.number += 1
+
+                    if "prompt" in json_data:
+                        prompt = json_data["prompt"]
+                        valid = execution.validate_prompt(prompt)
+                        extra_data = {}
+                        if "extra_data" in json_data:
+                            extra_data = json_data["extra_data"]
+
+                        if "client_id" in json_data:
+                            extra_data["client_id"] = json_data["client_id"]
+                        if valid[0]:
+                            prompt_id = str(uuid.uuid4())
+                            outputs_to_execute = valid[2]
+                            self.prompt_queue.put((number, prompt_id, prompt, extra_data, outputs_to_execute))
+                            response = {"prompt_id": prompt_id, "number": number, "node_errors": valid[3]}
+                            return web.json_response(response)
+                        else:
+                            logging.warning("invalid prompt: {}".format(valid[1]))
+                            return web.json_response({"error": valid[1], "node_errors": valid[3]}, status=400)
+                    else:
+                        return web.json_response({"error": "no prompt", "node_errors": []}, status=400)
+
+            except Exception as e:
+                return web.Response(text=f"An error occurred: {str(e)}", status=500)                
+                       
+
+        @routes.post("/api/nuke/async_ext2png")
         async def async_ext2png(request):
             try:
                 data = await request.json()
@@ -490,7 +562,7 @@ class PromptServer():
                             buffer.seek(0)
 
                             return web.Response(body=buffer.read(), content_type=f'image/{image_format}',
-                                                headers={"Content-Disposition": f"filename=\"{filename}\""})
+                                                headers={"Content-Disposition": f"filename=\"{filename}\"",'Accept-Ranges': 'bytes'})
 
                     if 'channel' not in request.rel_url.query:
                         channel = 'rgba'
@@ -510,7 +582,7 @@ class PromptServer():
                             buffer.seek(0)
 
                             return web.Response(body=buffer.read(), content_type='image/png',
-                                                headers={"Content-Disposition": f"filename=\"{filename}\""})
+                                                headers={"Content-Disposition": f"filename=\"{filename}\"",'Accept-Ranges': 'bytes'})
 
                     elif channel == 'a':
                         with Image.open(file) as img:
@@ -527,9 +599,10 @@ class PromptServer():
                             alpha_buffer.seek(0)
 
                             return web.Response(body=alpha_buffer.read(), content_type='image/png',
-                                                headers={"Content-Disposition": f"filename=\"{filename}\""})
+                                                headers={"Content-Disposition": f"filename=\"{filename}\"",'Accept-Ranges': 'bytes'})
                     else:
-                        return web.FileResponse(file, headers={"Content-Disposition": f"filename=\"{filename}\""})
+                        return web.FileResponse(file, 
+                                                headers={"Content-Disposition": f"filename=\"{filename}\"",'Accept-Ranges': 'bytes'})
 
             return web.Response(status=404)
 
@@ -790,7 +863,6 @@ class PromptServer():
             if isinstance(route, web.RouteDef):
                 api_routes.route(route.method, "/api" + route.path)(route.handler, **route.kwargs)
         self.app.add_routes(api_routes)
-        setup_swagger(self.app, swagger_url="/api/doc", ui_version=3)
         self.app.add_routes(self.routes)
 
 

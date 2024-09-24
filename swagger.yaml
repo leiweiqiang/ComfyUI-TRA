@@ -1,0 +1,317 @@
+swagger: "2.0"
+info:
+  description: "This API allows image uploads, EXR to PNG conversions with greenscreen removal, and other image processing operations."
+  version: "1.0.0"
+  title: "EXR to PNG Conversion and Image Processing API"
+host: "relighting-comfyui.tcl-research.us"
+basePath: "/api"
+schemes:
+  - "https"
+tags:
+  - name: "Relighting Workflow APIs"
+    description: "APIs for relighting workflow, including image uploads, EXR to PNG conversions, and other image processing operations"
+paths:
+  /api/nuke/upload:
+    post:
+      tags:
+        - "Relighting Workflow APIs"
+      summary: "Upload an image"
+      description: "Upload an image file using multipart/form-data."
+      consumes:
+        - "multipart/form-data"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "image"
+          in: "formData"
+          description: "The image file to be uploaded"
+          required: true
+          type: "file"
+      responses:
+        200:
+          description: "Image uploaded successfully"
+          schema:
+            type: "object"
+            properties:
+              name:
+                type: "string"
+                description: "The name of the uploaded file"
+              subfolder:
+                type: "string"
+                description: "The subfolder where the file is stored (if any)"
+              type:
+                type: "string"
+                description: "The type of file (input/output)"
+            example:
+              name: "sample.1015.exr"
+              subfolder: ""
+              type: "input"
+        400:
+          description: "No file uploaded"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        500:
+          description: "Internal server error"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+  /api/nuke/ext2png:
+    post:
+      tags:
+        - "Relighting Workflow APIs"
+      summary: "Convert EXR files to PNG"
+      description: "This endpoint processes EXR files, removes greenscreens, and converts them to PNG format."
+      operationId: "convertEXRToPNG"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "JSON array containing EXR file information"
+          required: true
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/EXRFileInfo"
+          example:
+            
+      responses:
+        200:
+          description: "A list of alpha PNG paths resulting from the greenscreen removal"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/PNGFileInfo"
+        400:
+          description: "Invalid input, such as missing fields or wrong data format"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        500:
+          description: "Internal server error"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+  /api/nuke/{prompt_id}:
+    get:
+      tags:
+        - "Relighting Workflow APIs"
+      summary: "Get task status"
+      parameters:
+        - in: path
+          name: prompt_id
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+              text:
+                type: string
+
+  /api/nuke/download:
+    get:
+      tags:
+        - "Relighting Workflow APIs"
+      summary: "Download results"
+      parameters:
+        - in: query
+          name: filename
+          required: true
+          type: string
+        - in: query
+          name: type
+          type: string
+        - in: query
+          name: subfolder
+          type: string
+      responses:
+        '200':
+          description: File downloaded successfully
+          schema:
+            type: file
+        '400':
+          description: Bad request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        '403':
+          description: Forbidden
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        '404':
+          description: File not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+  /api/nuke/async_ext2png:
+    post:
+      tags:
+        - "Relighting Workflow APIs"
+      summary: "Convert EXR to PNG asynchronously"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "JSON array containing EXR file information"
+          required: true
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/EXRFileInfo"
+          example:
+            
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              prompt_id:
+                type: string
+              number:
+                type: number
+              node_errors:
+                type: array
+        '400':
+          description: Bad request
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        '500':
+          description: Internal server error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+  /api/nuke/version:
+    get:
+      tags:
+        - "Relighting Workflow APIs"
+      summary: "Get API version information"
+      description: "This endpoint returns the current version of the API"
+      produces:
+        - "application/json"
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              version:
+                type: string
+                description: "The current version of the API"
+              release_date:
+                type: string
+                format: date
+                description: "The release date of the current version"
+            example:
+              version: "1.0.0"
+              release_date: "2024-09-16"
+        '500':
+          description: Internal server error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+definitions:
+  EXRFileInfo:
+    type: "object"
+    properties:
+      filename:
+        type: "string"
+        description: "Path to the EXR file"
+      subfolder:
+        type: "string"
+        description: "Subfolder for organizing output (can be empty)"
+      type:
+        type: "string"
+        description: "Type of the file (input or output)"
+    required:
+      - filename
+    example:
+      filename: "sample.1015.exr"
+      subfolder: ""
+      type: "input"
+
+  PNGFileInfo:
+    type: "object"
+    properties:
+      filename:
+        type: "string"
+        description: "The PNG file generated from the EXR file"
+      subfolder:
+        type: "string"
+        description: "The subfolder where the PNG file is stored"
+      type:
+        type: "string"
+        description: "The type of the file (output)"
+    example:
+        - filename: "sample.1001.exr"
+          subfolder: ""
+          type: "input"
+        - filename: "sample.1002.exr"
+          subfolder: ""
+          type: "input"
+        - filename: "sample.1003.exr"
+          subfolder: ""
+          type: "input"
+        - filename: "sample.1004.exr"
+          subfolder: ""
+          type: "input"
+        - filename: "sample.1005.exr"
+          subfolder: ""
+          type: "input"
+        - filename: "sample.1006.exr"
+          subfolder: ""
+          type: "input"
+        - filename: "sample.1007.exr"
+          subfolder: ""
+          type: "input"
+        - filename: "sample.1008.exr"
+          subfolder: ""
+          type: "input"
+        - filename: "sample.1009.exr"
+          subfolder: ""
+          type: "input"
+        - filename: "sample.1010.exr"
+          subfolder: ""
+          type: "input"
+        - filename: "sample.1011.exr"
+          subfolder: ""
+          type: "input"
+        - filename: "sample.1012.exr"
+          subfolder: ""
+          type: "input"
+        - filename: "sample.1013.exr"
+          subfolder: ""
+          type: "input"
+        - filename: "sample.1014.exr"
+          subfolder: ""
+          type: "input"
+        - filename: "sample.1015.exr"
+          subfolder: ""
+          type: "input"
+
+  ErrorResponse:
+    type: "object"
+    properties:
+      error:
+        type: "string"
+    example:
+      error: "An error occurred: error details"
+
+  ApiResponse:
+    type: "object"
+    properties:
+      code:
+        type: "integer"
+        format: "int32"
+      type:
+        type: "string"
+      message:
+        type: "string"
