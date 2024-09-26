@@ -1,7 +1,7 @@
 import yaml
 import subprocess
 
-class TclFrescoWarpedNoise:
+class TclFrescoWrapedNoise:
 
     def __init__(self):
         pass
