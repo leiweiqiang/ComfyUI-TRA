@@ -16,9 +16,9 @@ class TclFrescoWrapedNoise:
                 "max_images": ("INT", {"default": 3, "min": 3, "max": 200}),
                 "prompt": ("STRING", {"multiline": True, "default": ""}),
                 "negative": ("STRING", {"multiline": True, "default": ""}),
-                "video_path": ("STRING", {"multiline": False, "default": "/workspace/FRESCO-main/data/example/video_square.mp4"}),
-                "save_path": ("STRING", {"multiline": False, "default": "/workspace/FRESCO-main/output888"}),
-                "ref_img_ip_adapter": ("STRING", {"multiline": False, "default": "/workspace/FRESCO-main/data/example/ref_img.png"}),
+                "video_path": ("STRING", {"multiline": False, "default": "/workspace/FRESCO-wraped-noise/data/example/video_square.mp4"}),
+                "save_path": ("STRING", {"multiline": False, "default": "/workspace/FRESCO-wraped-noise/output888"}),
+                "ref_img_ip_adapter": ("STRING", {"multiline": False, "default": "/workspace/FRESCO-wraped-noise/data/example/ref_img.png"}),
                 "noise_type": ("STRING", {"multiline": False, "default": "integral"}),
             },
         }
