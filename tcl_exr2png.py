@@ -1,4 +1,4 @@
-from .greenscreen_utils import greenscreen_removal
+from .ComfyUI.greenscreen_utils import greenscreen_removal
 
 class TclExr2png:
 

@@ -32,7 +32,7 @@ from model_filemanager import download_model, DownloadModelStatus
 from typing import Optional
 from api_server.routes.internal.internal_routes import InternalRoutes
 
-from greenscreen_utils import greenscreen_removal
+from ComfyUI.greenscreen_utils import greenscreen_removal
 
 
 class BinaryEventTypes:

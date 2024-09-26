@@ -1,5 +1,5 @@
 import uuid
-from .greenscreen_utils import greenscreen_removal
+from .ComfyUI.greenscreen_utils import greenscreen_removal
 import logging
 import json
 import os
