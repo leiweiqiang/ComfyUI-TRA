@@ -1,7 +1,7 @@
 import os
 import subprocess
 
-class TclCheckPoints:
+class TclLoraCheckPoints:
     
     def __init__(self):
         pass

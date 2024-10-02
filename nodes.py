@@ -1,7 +1,7 @@
 from .tcl_lora_save_images import TclLoraSaveImages
 from .tcl_lora_gen_datasets import TclLoraGenDatasets
 from .tcl_lora_training import TclLoraTraining
-from .tcl_lora_checkpoints import TclLoraCheckpoints
+from .tcl_lora_checkpoints import TclLoraCheckPoints
 
 NODE_CLASS_MAPPINGS = {
     "TclLoraSaveImages":TclLoraSaveImages,
