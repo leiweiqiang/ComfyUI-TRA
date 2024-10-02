@@ -7,7 +7,7 @@ NODE_CLASS_MAPPINGS = {
     "TclLoraSaveImages":TclLoraSaveImages,
     "TclLoraGenDatasets":TclLoraGenDatasets,
     "TclLoraTraining":TclLoraTraining,
-    "TclLoraCheckpoints":TclLoraCheckpoints
+    "TclLoraCheckpoints":TclLoraCheckPoints
 }
 
 # A dictionary that contains the friendly/humanly readable titles for the nodes
