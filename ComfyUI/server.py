@@ -3,6 +3,7 @@ import sys
 import asyncio
 import traceback
 import uuid
+
 import nodes
 import folder_paths
 import execution
@@ -12,7 +13,6 @@ import json
 import glob
 import struct
 import ssl
-
 from PIL import Image, ImageOps
 from PIL.PngImagePlugin import PngInfo
 from io import BytesIO
@@ -32,7 +32,7 @@ from model_filemanager import download_model, DownloadModelStatus
 from typing import Optional
 from api_server.routes.internal.internal_routes import InternalRoutes
 
-from ComfyUI.greenscreen_utils import greenscreen_removal
+from greenscreen_utils import greenscreen_removal
 
 
 class BinaryEventTypes:
@@ -285,6 +285,7 @@ class PromptServer():
                     if not filename:
                         return web.Response(text="Missing required fields", status=400)
                     result = greenscreen_removal(filename, folder_uuid)
+                    logging.info(result)
                     output.append(result) 
                 
                 return web.json_response([item["alpha"] for item in output])
@@ -366,60 +367,7 @@ class PromptServer():
 
                 return web.FileResponse(file, headers={"Content-Disposition": f"filename=\"{filename}\""})
 
-            return web.Response(status=404) 
-
-
-        @routes.post("/api/nuke/relighting")
-        async def relighting(request):
-            try:
-                data = await request.json()
-                logging.info(data)
-
-                with open('relighting_zip_api.json', 'r', encoding='utf-8') as json_file:
-                    relighting_zip_api = json.load(json_file)
-                    relighting_zip_api["95"]["inputs"]["input_path"] = data["input_dir"]    
-                    logging.info(relighting_zip_api["95"])
-                    json_data = {
-                        "client_id": str(uuid.uuid4()),
-                        "prompt": relighting_zip_api
-                    }
-
-            
-
-                    if "number" in json_data:
-                        number = float(json_data['number'])
-                    else:
-                        number = self.number
-                        if "front" in json_data:
-                            if json_data['front']:
-                                number = -number
-
-                        self.number += 1
-
-                    if "prompt" in json_data:
-                        prompt = json_data["prompt"]
-                        valid = execution.validate_prompt(prompt)
-                        extra_data = {}
-                        if "extra_data" in json_data:
-                            extra_data = json_data["extra_data"]
-
-                        if "client_id" in json_data:
-                            extra_data["client_id"] = json_data["client_id"]
-                        if valid[0]:
-                            prompt_id = str(uuid.uuid4())
-                            outputs_to_execute = valid[2]
-                            self.prompt_queue.put((number, prompt_id, prompt, extra_data, outputs_to_execute))
-                            response = {"prompt_id": prompt_id, "number": number, "node_errors": valid[3]}
-                            return web.json_response(response)
-                        else:
-                            logging.warning("invalid prompt: {}".format(valid[1]))
-                            return web.json_response({"error": valid[1], "node_errors": valid[3]}, status=400)
-                    else:
-                        return web.json_response({"error": "no prompt", "node_errors": []}, status=400)
-
-            except Exception as e:
-                return web.Response(text=f"An error occurred: {str(e)}", status=500)                
-                       
+            return web.Response(status=404)        
 
         @routes.post("/api/nuke/async_ext2png")
         async def async_ext2png(request):
