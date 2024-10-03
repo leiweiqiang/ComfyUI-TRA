@@ -1,0 +1,24 @@
+serverAddr = "64.112.42.21"
+serverPort = 15443
+auth.token = "wp6edTzx3Z17bME3"
+
+[[proxies]]
+name = "ssh"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 22
+remotePort = 22
+
+[[proxies]]
+name = "comfyui"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 8188
+remotePort = 8188
+
+[[proxies]]
+name = "jupyter-notebook"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 8888
+remotePort = 8888
