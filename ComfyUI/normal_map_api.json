@@ -1,0 +1,41 @@
+{
+  "19": {
+    "inputs": {
+      "backbone": "vit-small",
+      "fx": 1000,
+      "fy": 1000,
+      "resolution": 1024,
+      "image": [
+        "36",
+        0
+      ]
+    },
+    "class_type": "Metric3D-NormalMapPreprocessor",
+    "_meta": {
+      "title": "Metric3D Normal Map"
+    }
+  },
+  "36": {
+    "inputs": {
+      "image": "bg_input_still.png",
+      "upload": "image"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Load Image"
+    }
+  },
+  "37": {
+    "inputs": {
+      "filename_prefix": "ComfyUI",
+      "images": [
+        "19",
+        0
+      ]
+    },
+    "class_type": "SaveImage",
+    "_meta": {
+      "title": "Save Image"
+    }
+  }
+}

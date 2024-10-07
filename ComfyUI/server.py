@@ -18,7 +18,7 @@ from PIL.PngImagePlugin import PngInfo
 from io import BytesIO
 
 import aiohttp
-from aiohttp import web
+from aiohttp import web,ClientSession
 import logging
 
 import mimetypes
@@ -256,15 +256,227 @@ class PromptServer():
 
                 return web.json_response({"name" : filename, "subfolder": subfolder, "type": image_upload_type})
             else:
-                return web.Response(status=400)
+                return web.Response(status=400)                 
 
         @routes.post("/upload/image")
         async def upload_image(request):
             post = await request.post()
-            return image_upload(post) 
+            return image_upload(post)
+
+        @routes.post("/api/depth_map")
+        async def depth_map(request):
+            post = await request.post()
+            image = post.get("image")
+            overwrite = post.get("overwrite")
+            image_is_duplicate = False
+
+            image_upload_type = post.get("type")
+            upload_dir, image_upload_type = get_dir_by_type(image_upload_type)
+
+            if image and image.file:
+                filename = image.filename
+                if not filename:
+                    return web.Response(status=400)
+
+                subfolder = post.get("subfolder", "")
+                full_output_folder = os.path.join(upload_dir, os.path.normpath(subfolder))
+                filepath = os.path.abspath(os.path.join(full_output_folder, filename))
+
+                if os.path.commonpath((upload_dir, filepath)) != upload_dir:
+                    return web.Response(status=400)
+
+                if not os.path.exists(full_output_folder):
+                    os.makedirs(full_output_folder)
+
+                split = os.path.splitext(filename)
+
+                if overwrite is not None and (overwrite == "true" or overwrite == "1"):
+                    pass
+                else:
+                    i = 1
+                    while os.path.exists(filepath):
+                        if compare_image_hash(filepath, image): #compare hash to prevent saving of duplicates with same name, fix for #3465
+                            image_is_duplicate = True
+                            break
+                        filename = f"{split[0]} ({i}){split[1]}"
+                        filepath = os.path.join(full_output_folder, filename)
+                        i += 1
+
+                if not image_is_duplicate:
+                    if image_save_function is not None:
+                        image_save_function(image, post, filepath)
+                    else:
+                        with open(filepath, "wb") as f:
+                            f.write(image.file.read())
+
+                with open('depth_map_api.json', 'r', encoding='utf-8') as json_file:
+                    img_depth_api = json.load(json_file)
+
+                    img_depth_api["11"]["inputs"]["image"] = filename   
+
+                    json_data = {
+                        "client_id": str(uuid.uuid4()),
+                        "prompt": img_depth_api
+                    }
+
+                    logging.info(json_data)
+
+                    if "number" in json_data:
+                        number = float(json_data['number'])
+                    else:
+                        number = self.number
+                        if "front" in json_data:
+                            if json_data['front']:
+                                number = -number
+
+                        self.number += 1
+
+                    if "prompt" in json_data:
+                        prompt = json_data["prompt"]
+                        valid = execution.validate_prompt(prompt)
+                        extra_data = {}
+                        if "extra_data" in json_data:
+                            extra_data = json_data["extra_data"]
+
+                        if "client_id" in json_data:
+                            extra_data["client_id"] = json_data["client_id"]
+                        if valid[0]:
+                            prompt_id = str(uuid.uuid4())
+                            outputs_to_execute = valid[2]
+                            self.prompt_queue.put((number, prompt_id, prompt, extra_data, outputs_to_execute))
+                            response = {"prompt_id": prompt_id, "number": number, "node_errors": valid[3]}
+
+
+                            async with ClientSession() as session:
+                                start_time = asyncio.get_event_loop().time()
+                                while asyncio.get_event_loop().time() - start_time < 30:
+                                    await asyncio.sleep(1)
+                                    history = self.prompt_queue.get_history(prompt_id=prompt_id)
+                                    if history != {}:
+                                        output = history[prompt_id]['outputs']['13']['images'][0]
+                                        return web.json_response({
+                                            "result": f"https://relighting-comfyui.tcl-research.us/view?filename={output['filename']}&type={output['type']}"
+                                        })
+                                        
+                                return web.json_response({"error": "Operation timed out"}, status=408)
+                        else:
+                            logging.warning("invalid prompt: {}".format(valid[1]))
+                            return web.json_response({"error": valid[1], "node_errors": valid[3]}, status=400)
+                    else:
+                        return web.json_response({"error": "no prompt", "node_errors": []}, status=400)                
+            else:
+                return web.Response(status=400)              
+
+        @routes.post("/api/normal_map")
+        async def normal_map(request):
+            query_params = request.rel_url.query
+            post = await request.post()
+            image = post.get("image")
+            overwrite = post.get("overwrite")
+            image_is_duplicate = False
+
+            image_upload_type = post.get("type")
+            upload_dir, image_upload_type = get_dir_by_type(image_upload_type)
+
+            if image and image.file:
+                filename = image.filename
+                if not filename:
+                    return web.Response(status=400)
+
+                subfolder = post.get("subfolder", "")
+                full_output_folder = os.path.join(upload_dir, os.path.normpath(subfolder))
+                filepath = os.path.abspath(os.path.join(full_output_folder, filename))
+
+                if os.path.commonpath((upload_dir, filepath)) != upload_dir:
+                    return web.Response(status=400)
+
+                if not os.path.exists(full_output_folder):
+                    os.makedirs(full_output_folder)
+
+                split = os.path.splitext(filename)
+
+                if overwrite is not None and (overwrite == "true" or overwrite == "1"):
+                    pass
+                else:
+                    i = 1
+                    while os.path.exists(filepath):
+                        if compare_image_hash(filepath, image): #compare hash to prevent saving of duplicates with same name, fix for #3465
+                            image_is_duplicate = True
+                            break
+                        filename = f"{split[0]} ({i}){split[1]}"
+                        filepath = os.path.join(full_output_folder, filename)
+                        i += 1
+
+                if not image_is_duplicate:
+                    if image_save_function is not None:
+                        image_save_function(image, post, filepath)
+                    else:
+                        with open(filepath, "wb") as f:
+                            f.write(image.file.read())
+
+                with open('normal_map_api.json', 'r', encoding='utf-8') as json_file:
+                    normal_map_api = json.load(json_file)
+
+                    normal_map_api["36"]["inputs"]["image"] = filename   
+                    normal_map_api["19"]["inputs"]["fx"] = query_params.get("fx")
+                    normal_map_api["19"]["inputs"]["fy"] = query_params.get("fy")
+                    normal_map_api["19"]["inputs"]["resolution"] = query_params.get("resolution")
+                    
+                    json_data = {
+                        "client_id": str(uuid.uuid4()),
+                        "prompt": normal_map_api
+                    }
+
+                    logging.info(json_data)
+
+                    if "number" in json_data:
+                        number = float(json_data['number'])
+                    else:
+                        number = self.number
+                        if "front" in json_data:
+                            if json_data['front']:
+                                number = -number
+
+                        self.number += 1
+
+                    if "prompt" in json_data:
+                        prompt = json_data["prompt"]
+                        valid = execution.validate_prompt(prompt)
+                        extra_data = {}
+                        if "extra_data" in json_data:
+                            extra_data = json_data["extra_data"]
+
+                        if "client_id" in json_data:
+                            extra_data["client_id"] = json_data["client_id"]
+                        if valid[0]:
+                            prompt_id = str(uuid.uuid4())
+                            outputs_to_execute = valid[2]
+                            self.prompt_queue.put((number, prompt_id, prompt, extra_data, outputs_to_execute))
+                            response = {"prompt_id": prompt_id, "number": number, "node_errors": valid[3]}
+
+
+                            async with ClientSession() as session:
+                                start_time = asyncio.get_event_loop().time()
+                                while asyncio.get_event_loop().time() - start_time < 30:
+                                    await asyncio.sleep(1)
+                                    history = self.prompt_queue.get_history(prompt_id=prompt_id)
+                                    if history != {}:
+                                        output = history[prompt_id]['outputs']['37']['images'][0]
+                                        return web.json_response({
+                                            "result": f"https://relighting-comfyui.tcl-research.us/view?filename={output['filename']}&type={output['type']}"
+                                        })
+                                        
+                                return web.json_response({"error": "Operation timed out"}, status=408)
+                        else:
+                            logging.warning("invalid prompt: {}".format(valid[1]))
+                            return web.json_response({"error": valid[1], "node_errors": valid[3]}, status=400)
+                    else:
+                        return web.json_response({"error": "no prompt", "node_errors": []}, status=400)                
+            else:
+                return web.Response(status=400)  
 
         @routes.post("/api/nuke/upload")
-        async def upload_image(request):
+        async def nuke_upload(request):
             post = await request.post()
             return image_upload(post)     
 
@@ -294,14 +506,14 @@ class PromptServer():
                 return web.Response(text=f"An error occurred: {str(e)}", status=500)
 
         @routes.get("/api/nuke/version")
-        async def get_history(request):
+        async def nuke_version(request):
             return web.json_response({
                 "version": "1.0.0",
                 "release_date": "2024-09-16"
             })
 
         @routes.get("/api/nuke/{prompt_id}")
-        async def get_history(request):
+        async def nuke_history(request):
             # prompt_id = request.match_info.get("prompt_id", None)
             # return web.json_response(self.prompt_queue.get_history(prompt_id=prompt_id))
             prompt_id = request.match_info.get("prompt_id", None)
@@ -340,7 +552,7 @@ class PromptServer():
                     "error": f"Unexpected error: {str(e)}"}, status=500)
 
         @routes.get("/api/nuke/download")
-        async def view_image(request):
+        async def nuke_download(request):
             if "filename" in request.rel_url.query:
                 filename = request.rel_url.query["filename"]
                 filename,output_dir = folder_paths.annotated_filepath(filename)

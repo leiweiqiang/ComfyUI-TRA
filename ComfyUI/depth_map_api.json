@@ -1,0 +1,39 @@
+{
+    "10": {
+      "inputs": {
+        "ckpt_name": "depth_anything_v2_vitl.pth",
+        "resolution": 1024,
+        "image": [
+          "11",
+          0
+        ]
+      },
+      "class_type": "DepthAnythingV2Preprocessor",
+      "_meta": {
+        "title": "Depth Anything V2 - Relative"
+      }
+    },
+    "11": {
+      "inputs": {
+        "image": "bg_input_still.png",
+        "upload": "image"
+      },
+      "class_type": "LoadImage",
+      "_meta": {
+        "title": "Load Image"
+      }
+    },
+    "13": {
+      "inputs": {
+        "filename_prefix": "ComfyUI",
+        "images": [
+          "10",
+          0
+        ]
+      },
+      "class_type": "SaveImage",
+      "_meta": {
+        "title": "Save Image"
+      }
+    }
+  }
