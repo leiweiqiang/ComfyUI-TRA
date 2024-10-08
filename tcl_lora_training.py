@@ -65,7 +65,7 @@ class TclLoraTraining:
         ]
 
         try:
-            result = subprocess.run(command, check=True, capture_output=True, text=True, cwd="/root/workspace/for_weiqiang/sd-scripts-mask")
+            result = subprocess.run(command, check=True, capture_output=True, text=True, cwd="/sd-scripts-mask")
             return [command, result.stdout, result.stderr]
         except subprocess.CalledProcessError as e:
             print("Command failed with exit status:", e.returncode)
