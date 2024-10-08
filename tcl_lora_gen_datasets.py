@@ -31,8 +31,8 @@ class TclLoraGenDatasets:
             },
         }
 
-    RETURN_TYPES = ("STRING",)  # Change the return type to LIST for the paths
-    RETURN_NAMES = ("help",)
+    RETURN_TYPES = ("STRING","STRING","STRING",)  # Change the return type to LIST for the paths
+    RETURN_NAMES = ("dataset_config_path", "output_dir", "output_prefix",)  # Add the return names
     FUNCTION = "process_images"
     CATEGORY = "TCL Research America"
 
@@ -46,8 +46,12 @@ class TclLoraGenDatasets:
         save_raw(reg_images, reg_images_dir, id, base_dir)
         save_reg(reg_masks, reg_masks_dir, id, base_dir)
         save_caption(reg_captions, reg_images_dir, id, base_dir)
-        save_toml(toml, reg_images_dir, id, base_dir)
-        return "success",
+        
+        toml_path = os.path.join(folder_paths.get_output_directory(), base_dir, id, f"lora.toml")
+        save_toml(toml, toml_path)
+        
+        return toml_path, os.path.join(base_dir, folder_paths.get_output_directory(), id, "output"), id,
+
 
 def save_raw(images, path, id, base_dir):
     images_list = images.splitlines()
@@ -68,7 +72,6 @@ def save_caption(images, path, id, base_dir):
         with open(output_path, 'w', encoding='utf-8') as file:
             file.write(caption)
 
-def save_toml(toml, path, id, base_dir):
-    output_path = os.path.join(folder_paths.get_output_directory(), base_dir, id, f"lora.toml")
-    with open(output_path, 'w', encoding='utf-8') as file:
+def save_toml(toml, toml_path):
+    with open(toml_path, 'w', encoding='utf-8') as file:
         file.write(toml)
