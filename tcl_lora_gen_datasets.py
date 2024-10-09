@@ -37,7 +37,7 @@ class TclLoraGenDatasets:
     CATEGORY = "TCL Research America"
 
     def process_images(self, id, base_dir, raw_images, raw_images_dir, raw_masks, raw_masks_dir, raw_captions, reg_images, reg_images_dir, reg_masks, reg_masks_dir, reg_captions, toml):
-        directory = os.path.join(folder_paths.get_output_directory(), base_dir, id)
+        directory = os.path.join("/ComfyUI/input", base_dir, id)
         if os.path.exists(directory) and os.path.isdir(directory):
             shutil.rmtree(directory)
         save_raw(raw_images, raw_images_dir, id, base_dir)
@@ -47,28 +47,28 @@ class TclLoraGenDatasets:
         save_reg(reg_masks, reg_masks_dir, id, base_dir)
         save_caption(reg_captions, reg_images_dir, id, base_dir)
         
-        toml_path = os.path.join(folder_paths.get_output_directory(), base_dir, id, f"lora.toml")
+        toml_path = os.path.join("/ComfyUI/input", base_dir, id, f"lora.toml")
         save_toml(toml, toml_path)
         
-        return toml_path, os.path.join(folder_paths.get_output_directory(), base_dir, id, "output"), id,
+        return toml_path, os.path.join("/ComfyUI/input", base_dir, id, "output"), id,
 
 
 def save_raw(images, path, id, base_dir):
     images_list = images.splitlines()
     for index, image in enumerate(images_list):
-        os.makedirs(os.path.join(folder_paths.get_output_directory(), base_dir, id, path), exist_ok=True)
-        shutil.copy(os.path.join(folder_paths.get_output_directory(), image), os.path.join(folder_paths.get_output_directory(), base_dir, id, path, f"{index:04d}.png"))
+        os.makedirs(os.path.join("/ComfyUI/input", base_dir, id, path), exist_ok=True)
+        shutil.copy(os.path.join("/ComfyUI/input", image), os.path.join("/ComfyUI/input", base_dir, id, path, f"{index:04d}.png"))
 
 def save_reg(images, path, id, base_dir):
     images_list = images.splitlines()
     for index, image in enumerate(images_list):
-        os.makedirs(os.path.join(folder_paths.get_output_directory(), base_dir, id, path), exist_ok=True)
-        shutil.copy(os.path.join(folder_paths.get_output_directory(), image), os.path.join(folder_paths.get_output_directory(), base_dir, id, path, f"{index:04d}.png"))
+        os.makedirs(os.path.join("/ComfyUI/input", base_dir, id, path), exist_ok=True)
+        shutil.copy(os.path.join("/ComfyUI/input", image), os.path.join("/ComfyUI/input", base_dir, id, path, f"{index:04d}.png"))
 
 def save_caption(images, path, id, base_dir):
     images_list = images.splitlines()
     for index, caption in enumerate(images_list):
-        output_path = os.path.join(folder_paths.get_output_directory(), base_dir, id, path, f"{index:04d}.txt")
+        output_path = os.path.join("/ComfyUI/input", base_dir, id, path, f"{index:04d}.txt")
         with open(output_path, 'w', encoding='utf-8') as file:
             file.write(caption)
 
