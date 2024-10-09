@@ -22,7 +22,7 @@ class TclLoraTraining:
     CATEGORY = "TCL Research America"
 
     def training(self, DATASET_CONFIG, OUTPUT_DIR, TRAINING_SET, seed):
-        ckpt = "/root/workspace/ComfyUI/models/checkpoints/dreamshaperXL_v21TurboDPMSDE.safetensors"
+        ckpt = "/ComfyUI/models/checkpoints/dreamshaperXL_v21TurboDPMSDE.safetensors"
         learning_rate = "0.0001"
         text_encoder_lr = "4e-05"
         train_batch_size = "1"
