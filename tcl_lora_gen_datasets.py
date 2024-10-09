@@ -50,7 +50,7 @@ class TclLoraGenDatasets:
         toml_path = os.path.join(folder_paths.get_output_directory(), base_dir, id, f"lora.toml")
         save_toml(toml, toml_path)
         
-        return toml_path, os.path.join(base_dir, folder_paths.get_output_directory(), id, "output"), id,
+        return toml_path, os.path.join(folder_paths.get_output_directory(), base_dir, id, "output"), id,
 
 
 def save_raw(images, path, id, base_dir):
