@@ -64,13 +64,13 @@ def save_raw(images, path, id, base_dir):
     images_list = images.splitlines()
     for index, image in enumerate(images_list):
         os.makedirs(os.path.join(base_dir, id, path), exist_ok=True)
-        shutil.copy(os.path.join("/ComfyUI/input", image), os.path.join(base_dir, id, path, f"{index:04d}.png"))
+        shutil.copy(os.path.join("/ComfyUI/output", image), os.path.join(base_dir, id, path, f"{index:04d}.png"))
 
 def save_reg(images, path, id, base_dir):
     images_list = images.splitlines()
     for index, image in enumerate(images_list):
         os.makedirs(os.path.join(base_dir, id, path), exist_ok=True)
-        shutil.copy(os.path.join("/ComfyUI/input", image), os.path.join(base_dir, id, path, f"{index:04d}.png"))
+        shutil.copy(os.path.join("/ComfyUI/output", image), os.path.join(base_dir, id, path, f"{index:04d}.png"))
 
 def save_caption(images, path, id, base_dir):
     images_list = images.splitlines()
