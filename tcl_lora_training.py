@@ -10,7 +10,7 @@ class TclLoraTraining:
     def __init__(self):
         self.logger = logging.getLogger(__name__)
         self.prompt_server = PromptServer.instance
-        self.api_url = "https://minestudio.tcl-research.us/api/lora-training-log"
+        self.api_url = "https://minestudio.tcl-research.us/api/lora_training_log"
         self.prompt_id = ""
 
     @classmethod
