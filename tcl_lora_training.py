@@ -1,14 +1,21 @@
 import subprocess
+import os
+import json
+import logging
+import requests
+from server import PromptServer
 
 class TclLoraTraining:
-
     def __init__(self):
-        pass
+        self.logger = logging.getLogger(__name__)
+        self.prompt_server = PromptServer.instance
+        self.api_url = "https://minestudio.tcl-research.us/api/lora-training-log"
+        self.prompt_id = ""
 
     @classmethod
     def INPUT_TYPES(s):
         return {
-            'required': {
+            "required": {
                 "DATASET_CONFIG": ("STRING", {"multiline": False, "default": "/root/lora_model/datasets/80b61206-81b5-48c6-9f82-526cb473bc94/lora.toml"}),
                 "OUTPUT_DIR": ("STRING", {"multiline": False, "default": "/root/lora_model/datasets/80b61206-81b5-48c6-9f82-526cb473bc94/output"}),
                 "TRAINING_SET": ("STRING", {"multiline": False, "default": "80b61206-81b5-48c6-9f82-526cb473bc94"}),
@@ -17,9 +24,23 @@ class TclLoraTraining:
         }
 
     RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("cmd",)    
+    RETURN_NAMES = ("status",)    
     FUNCTION = "training"
     CATEGORY = "TCL Research America"
+
+    def log(self, message, level="info"):
+        if level == "info":
+            self.logger.info(message)
+        elif level == "error":
+            self.logger.error(message)
+        elif level == "warning":
+            self.logger.warning(message)
+        
+        data = {
+            "message": message,
+            "level": level
+        }
+        self.prompt_server.send_sync("lora_training_log", data)
 
     def training(self, DATASET_CONFIG, OUTPUT_DIR, TRAINING_SET, seed):
         ckpt = "/ComfyUI/models/checkpoints/dreamshaperXL_v21TurboDPMSDE.safetensors"
@@ -28,8 +49,9 @@ class TclLoraTraining:
         train_batch_size = "1"
         save_every_x_epochs = "10"
         scheduler = "constant"
-        num_epochs = "10"
+        num_epochs = "1"
         network_dim = "64"
+        self.prompt_id = TRAINING_SET
 
         command = [
             'accelerate', 'launch',
@@ -64,11 +86,33 @@ class TclLoraTraining:
             '--masked_loss'
         ]
 
+        self.log(f"Starting LORA training with command: {' '.join(command)}")
+
         try:
-            result = subprocess.run(command, check=True, capture_output=True, text=True, cwd="/sd-scripts-mask")
-            return [command, result.stdout, result.stderr]
-        except subprocess.CalledProcessError as e:
-            print("Command failed with exit status:", e.returncode)
-            print("Command output:", e.stderr)
-            raise
-        return [command, ]
+            process = subprocess.Popen(
+                command,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+                cwd="/sd-scripts-mask"
+            )
+            
+            while True:
+                output = process.stdout.readline()
+                if output == '' and process.poll() is not None:
+                    break
+                if output:
+                    self.log(output.strip())
+            
+            return_code = process.poll()
+            
+            if return_code == 0:
+                self.log("LORA training completed successfully")
+                return ("Training completed successfully",)
+            else:
+                self.log(f"LORA training failed with return code {return_code}", level="error")
+                return (f"Training failed with return code {return_code}",)
+        
+        except Exception as e:
+            self.log(f"An error occurred during LORA training: {str(e)}", level="error")
+            return (f"Error occurred: {str(e)}",)

@@ -21,7 +21,7 @@ class TclLoraCheckPoints:
     CATEGORY = "TCL Research America"
 
     def checkpoints(self, ID, seed):
-        files_and_dirs = list_file_names_in_directory(os.path.join("/", "root", "workspace", "LoRA_Training_Datasets", ID, "output"))
+        files_and_dirs = list_file_names_in_directory(os.path.join("/ComfyUI/input/LoRA_Training_Datasets", ID, "output"))
         ln_create(files_and_dirs, ID)
         return [files_and_dirs,]
 
@@ -37,7 +37,7 @@ def list_file_names_in_directory(directory):
 
 def ln_create(file_names, ID):
     for file in file_names:
-        src_path = f'/root/workspace/LoRA_Training_Datasets/{ID}/output/{file}'
-        dest_path = f'/root/workspace/ComfyUI/output/{file}'
+        src_path = f'/ComfyUI/input/LoRA_Training_Datasets/{ID}/output/{file}'
+        dest_path = f'/ComfyUI/output/{file}'
         if not os.path.exists(dest_path):
             command = ['ln', '-s', src_path, dest_path]
