@@ -55,9 +55,9 @@ class TclLoraTraining:
     def send_log_data(self, data):
         try:
             response = requests.post(self.api_url, json=data)
-            if response.status_code == 200:
-                self.logger.info("Log data sent successfully")
-            else:
+            if response.status_code != 200:
+                # self.logger.info("Log data sent successfully")
+            # else:
                 self.logger.error(f"Failed to send log data: {response.status_code} - {response.text}")
         except Exception as e:
             self.logger.error(f"Error sending log data: {str(e)}")
