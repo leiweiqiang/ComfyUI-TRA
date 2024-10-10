@@ -50,12 +50,12 @@ class TclLoraGenDatasets:
         save_caption(reg_captions, reg_images_dir, id, base_dir)
         
         output_dir = os.path.join(base_dir, id, "output")
-        toml_path = os.path.join(base_dir, id, f"lora.toml")
+        toml_path = os.path.join(base_dir, id, "lora.toml")
         save_toml(toml, toml_path)
 
-        self.logger.info("dataset_config_path", toml_path)
-        self.logger.info("output_dir", output_dir)
-        self.logger.info("output_prefix", id)
+        self.logger.info(f"dataset_config_path: {toml_path}")
+        self.logger.info(f"output_dir: {output_dir}")
+        self.logger.info(f"output_prefix: {id}")
         
         return toml_path, output_dir, id,
 

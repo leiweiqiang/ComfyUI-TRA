@@ -19,6 +19,11 @@ class TclLoraTraining:
                 "DATASET_CONFIG": ("STRING", {"multiline": False, "default": "/root/lora_model/datasets/80b61206-81b5-48c6-9f82-526cb473bc94/lora.toml"}),
                 "OUTPUT_DIR": ("STRING", {"multiline": False, "default": "/root/lora_model/datasets/80b61206-81b5-48c6-9f82-526cb473bc94/output"}),
                 "TRAINING_SET": ("STRING", {"multiline": False, "default": "80b61206-81b5-48c6-9f82-526cb473bc94"}),
+                "learning_rate": ("STRING", {"multiline": False, "default": "0.0001"}),
+                "train_batch_size": ("STRING", {"multiline": False, "default": "1"}),
+                "num_epochs": ("STRING", {"multiline": False, "default": "100"}),
+                "save_every_x_epochs": ("STRING", {"multiline": False, "default": "10"}),
+                "output_name_prefix": ("STRING", {"multiline": False, "default": "80b61206-81b5-48c6-9f82-526cb473bc94"}),
                 "seed": ("STRING", {"multiline": False, "default": "7697797"}),
             },
         }
@@ -42,14 +47,14 @@ class TclLoraTraining:
         }
         self.prompt_server.send_sync("lora_training_log", data)
 
-    def training(self, DATASET_CONFIG, OUTPUT_DIR, TRAINING_SET, seed):
+    def training(self, DATASET_CONFIG, OUTPUT_DIR, TRAINING_SET, learning_rate, train_batch_size, num_epochs, save_every_x_epochs, output_name_prefix, seed):
         ckpt = "/ComfyUI/models/checkpoints/dreamshaperXL_v21TurboDPMSDE.safetensors"
-        learning_rate = "0.0001"
+        # learning_rate = "0.0001"
         text_encoder_lr = "4e-05"
-        train_batch_size = "1"
-        save_every_x_epochs = "10"
+        # train_batch_size = "1"
+        # save_every_x_epochs = "10"
         scheduler = "constant"
-        num_epochs = "1"
+        # num_epochs = "10"
         network_dim = "64"
         self.prompt_id = TRAINING_SET
 
@@ -60,7 +65,7 @@ class TclLoraTraining:
             f'--pretrained_model_name_or_path={ckpt}',
             f'--dataset_config={DATASET_CONFIG}',
             f'--output_dir={OUTPUT_DIR}',
-            f'--output_name={TRAINING_SET}_last_e{num_epochs}_n{network_dim}',
+            f'--output_name={output_name_prefix}_last_e{num_epochs}_n{network_dim}',
             '--caption_extension=.txt',
             '--prior_loss_weight=1',
             '--network_alpha=16',
@@ -80,7 +85,7 @@ class TclLoraTraining:
             '--color_aug',
             f'--network_dim={network_dim}',
             f'--lr_scheduler={scheduler}',
-            f'--training_comment=LORA:{TRAINING_SET}',
+            f'--training_comment=LORA:{output_name_prefix}',
             '--optimizer_type=AdamW',
             '--max_data_loader_n_workers=0',
             '--masked_loss'
