@@ -4,6 +4,7 @@ import json
 import logging
 import requests
 from server import PromptServer
+import concurrent.futures
 
 class TclLoraTraining:
     def __init__(self):
@@ -46,6 +47,20 @@ class TclLoraTraining:
             "level": level
         }
         self.prompt_server.send_sync("lora_training_log", data)
+
+        # Send the log data asynchronously
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            executor.submit(self.send_log_data, {"prompt_id": self.prompt_id, "message": message, "level": level})
+
+    def send_log_data(self, data):
+        try:
+            response = requests.post(self.api_url, json=data)
+            if response.status_code == 200:
+                self.logger.info("Log data sent successfully")
+            else:
+                self.logger.error(f"Failed to send log data: {response.status_code} - {response.text}")
+        except Exception as e:
+            self.logger.error(f"Error sending log data: {str(e)}")
 
     def training(self, DATASET_CONFIG, OUTPUT_DIR, TRAINING_SET, learning_rate, train_batch_size, num_epochs, save_every_x_epochs, output_name_prefix, seed):
         ckpt = "/ComfyUI/models/checkpoints/dreamshaperXL_v21TurboDPMSDE.safetensors"
