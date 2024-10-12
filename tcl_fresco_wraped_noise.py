@@ -1,5 +1,11 @@
-import yaml
 import subprocess
+import yaml
+import os
+import json
+import logging
+import requests
+from server import PromptServer
+import concurrent.futures
 
 class TclFrescoWrapedNoise:
 
@@ -29,7 +35,77 @@ class TclFrescoWrapedNoise:
     OUTPUT_NODE = False
     CATEGORY = "TCL Research America"
 
-    def fresco(self, model_type, controlnet_strength, ip_adapter_scale, max_images, prompt, negative, video_path, save_path, ref_img_ip_adapter, noise_type):
+import subprocess
+import yaml
+import os
+import json
+import logging
+import requests
+from server import PromptServer
+import concurrent.futures
+
+class TclFrescoWrapedNoise:
+    def __init__(self):
+        self.logger = logging.getLogger(__name__)
+        self.prompt_server = PromptServer.instance
+        self.api_url = "https://minestudio.tcl-research.us/api/lora_training_log"
+        self.prompt_id = ""
+
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            'required': {
+                "model_type": (["XL", "kolors"],),
+                "controlnet_strength": ("FLOAT", {"default": 0.7, "min": 0.7, "max": 1.0}),
+                "ip_adapter_scale": ("FLOAT", {"default": 0.3, "min": 0.3, "max": 0.9}),
+                "max_images": ("INT", {"default": 3, "min": 3, "max": 200}),
+                "prompt": ("STRING", {"multiline": True, "default": ""}),
+                "negative": ("STRING", {"multiline": True, "default": ""}),
+                "video_path": ("STRING", {"multiline": False, "default": "/workspace/FRESCO-wraped-noise/data/example/video_square.mp4"}),
+                "save_path": ("STRING", {"multiline": False, "default": "/workspace/FRESCO-wraped-noise/output888"}),
+                "ref_img_ip_adapter": ("STRING", {"multiline": False, "default": "/workspace/FRESCO-wraped-noise/data/example/ref_img.png"}),
+                "noise_type": ("STRING", {"multiline": False, "default": "integral"}),
+                "prompt_id": ("STRING", {"multiline": False, "default": ""}),
+            },
+        }
+
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("help",)
+    FUNCTION = "fresco"
+    OUTPUT_NODE = False
+    CATEGORY = "TCL Research America"
+
+    def log(self, message, level="info"):
+        if level == "info":
+            self.logger.info(message)
+        elif level == "error":
+            self.logger.error(message)
+        elif level == "warning":
+            self.logger.warning(message)
+        
+        data = {
+            "message": message,
+            "level": level
+        }
+        self.prompt_server.send_sync("lora_training_log", data)
+
+        # Send the log data asynchronously
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            executor.submit(self.send_log_data, {"prompt_id": self.prompt_id, "message": message, "level": level})
+
+    def send_log_data(self, data):
+        try:
+            response = requests.post(self.api_url, json=data)
+            if response.status_code != 200:
+                # self.logger.info("Log data sent successfully")
+            # else:
+                self.logger.error(f"Failed to send log data: {response.status_code} - {response.text}")
+        except Exception as e:
+            self.logger.error(f"Error sending log data: {str(e)}")
+
+
+    def fresco(self, model_type, controlnet_strength, ip_adapter_scale, max_images, prompt, negative, video_path, save_path, ref_img_ip_adapter, noise_type, prompt_id):
+        self.prompt_id = prompt_id
         # Define the base YAML configurations
         yaml_data = {
             "kolors": {
@@ -115,6 +191,36 @@ class TclFrescoWrapedNoise:
 
         # Run the Python script using the saved config file, after activating the virtual environment
         command = f"PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:512 python /workspace/FRESCO-wraped-noise/run_fresco_updated.py --config_path {config_path} "
-        subprocess.run(command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd="/workspace/FRESCO-wraped-noise")
+        # subprocess.run(command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd="/workspace/FRESCO-wraped-noise")
+        self.log(f"Starting Fresco Wraped Noise training with command: {command}")
 
-        return ("weiqianglei@tcl.com",)
+        try:
+            process = subprocess.Popen(
+                command,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+                cwd="/workspace/FRESCO-wraped-noise"
+            )
+            
+            while True:
+                output = process.stdout.readline()
+                if output == '' and process.poll() is not None:
+                    break
+                if output:
+                    self.log(output.strip())
+            
+            return_code = process.poll()
+            
+            if return_code == 0:
+                self.log("LORA training completed successfully")
+                return ("Training completed successfully",)
+            else:
+                self.log(f"LORA training failed with return code {return_code}", level="error")
+                return (f"Training failed with return code {return_code}",)
+        
+        except Exception as e:
+            self.log(f"An error occurred during LORA training: {str(e)}", level="error")
+            return (f"Error occurred: {str(e)}",)
+                
+

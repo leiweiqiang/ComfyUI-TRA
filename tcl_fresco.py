@@ -1,10 +1,18 @@
-import yaml
 import subprocess
+import yaml
+import os
+import json
+import logging
+import requests
+from server import PromptServer
+import concurrent.futures
 
-class TclFresco:
-
+class TclLoraTraining:
     def __init__(self):
-        pass
+        self.logger = logging.getLogger(__name__)
+        self.prompt_server = PromptServer.instance
+        self.api_url = "https://minestudio.tcl-research.us/api/lora_training_log"
+        self.prompt_id = ""
 
     @classmethod
     def INPUT_TYPES(s):
@@ -19,6 +27,7 @@ class TclFresco:
                 "video_path": ("STRING", {"multiline": False, "default": "/workspace/FRESCO-main/data/example/video_square.mp4"}),
                 "save_path": ("STRING", {"multiline": False, "default": "/workspace/FRESCO-main/output888"}),
                 "ref_img_ip_adapter": ("STRING", {"multiline": False, "default": "/workspace/FRESCO-main/data/example/ref_img.png"}),
+                "prompt_id": ("STRING", {"multiline": False, "default": ""}),
             },
         }
 
@@ -28,7 +37,37 @@ class TclFresco:
     OUTPUT_NODE = False
     CATEGORY = "TCL Research America"
 
-    def fresco(self, model_type, controlnet_strength, ip_adapter_scale, max_images, prompt, negative, video_path, save_path, ref_img_ip_adapter):
+    def log(self, message, level="info"):
+        if level == "info":
+            self.logger.info(message)
+        elif level == "error":
+            self.logger.error(message)
+        elif level == "warning":
+            self.logger.warning(message)
+        
+        data = {
+            "message": message,
+            "level": level
+        }
+        self.prompt_server.send_sync("lora_training_log", data)
+
+        # Send the log data asynchronously
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            executor.submit(self.send_log_data, {"prompt_id": self.prompt_id, "message": message, "level": level})
+
+    def send_log_data(self, data):
+        try:
+            response = requests.post(self.api_url, json=data)
+            if response.status_code != 200:
+                # self.logger.info("Log data sent successfully")
+            # else:
+                self.logger.error(f"Failed to send log data: {response.status_code} - {response.text}")
+        except Exception as e:
+            self.logger.error(f"Error sending log data: {str(e)}")
+
+
+    def fresco(self, model_type, controlnet_strength, ip_adapter_scale, max_images, prompt, negative, video_path, save_path, ref_img_ip_adapter, prompt_id):
+        self.prompt_id = prompt_id
         # Define the base YAML configurations
         yaml_data = {
             "kolors": {
@@ -111,6 +150,36 @@ class TclFresco:
 
         # Run the Python script using the saved config file, after activating the virtual environment
         command = f"PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:512 python /workspace/FRESCO-main/run_fresco_updated.py --config_path {config_path} "
-        subprocess.run(command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd="/workspace/FRESCO-main")
+        # subprocess.run(command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd="/workspace/FRESCO-main")
+        self.log(f"Starting Fresco training with command: {command}")
 
-        return ("weiqianglei@tcl.com",)
+        try:
+            process = subprocess.Popen(
+                command,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+                cwd="/workspace/FRESCO-main"
+            )
+            
+            while True:
+                output = process.stdout.readline()
+                if output == '' and process.poll() is not None:
+                    break
+                if output:
+                    self.log(output.strip())
+            
+            return_code = process.poll()
+            
+            if return_code == 0:
+                self.log("LORA training completed successfully")
+                return ("Training completed successfully",)
+            else:
+                self.log(f"LORA training failed with return code {return_code}", level="error")
+                return (f"Training failed with return code {return_code}",)
+        
+        except Exception as e:
+            self.log(f"An error occurred during LORA training: {str(e)}", level="error")
+            return (f"Error occurred: {str(e)}",)
+                
+
