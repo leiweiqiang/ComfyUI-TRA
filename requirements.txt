@@ -3,3 +3,4 @@ piexif
 pandas
 toml
 xformers
+watchdog
