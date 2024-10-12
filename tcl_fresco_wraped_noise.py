@@ -190,7 +190,7 @@ class TclFrescoWrapedNoise:
             yaml.dump(config, yaml_file)
 
         # Run the Python script using the saved config file, after activating the virtual environment
-        command = f"PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:512 python /workspace/FRESCO-wraped-noise/run_fresco_updated.py --config_path {config_path} "
+        command = f"PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:512 python /workspace/FRESCO-wraped-noise/run_fresco_updated.py --config_path {config_path}"
         # subprocess.run(command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd="/workspace/FRESCO-wraped-noise")
         self.log(f"Starting Fresco Wraped Noise training with command: {command}")
 
