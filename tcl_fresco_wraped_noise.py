@@ -6,6 +6,7 @@ import logging
 import requests
 from server import PromptServer
 import concurrent.futures
+import time
 
 class TclFrescoWrapedNoise:
 
@@ -195,6 +196,7 @@ class TclFrescoWrapedNoise:
         self.log(f"Starting Fresco Wraped Noise training with command: {command}")
 
         try:
+            time.sleep(0.5)
             process = subprocess.Popen(
                 command,
                 stdout=subprocess.PIPE,

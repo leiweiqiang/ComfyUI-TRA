@@ -6,6 +6,7 @@ import logging
 import requests
 from server import PromptServer
 import concurrent.futures
+import time
 
 class TclFresco:
     def __init__(self):
@@ -154,6 +155,7 @@ class TclFresco:
         self.log(f"Starting Fresco training with command: {command}")
 
         try:
+            time.sleep(0.5)
             process = subprocess.Popen(
                 command,
                 stdout=subprocess.PIPE,
