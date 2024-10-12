@@ -49,7 +49,7 @@ class TclFresco:
             "message": message,
             "level": level
         }
-        self.prompt_server.send_sync("lora_training_log", data)
+        self.prompt_server.send_sync("fresco_log", data)
 
         # Send the log data asynchronously
         with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -180,14 +180,14 @@ class TclFresco:
             return_code = process.poll()
             
             if return_code == 0:
-                self.log("LORA training completed successfully")
+                self.log("FRESCO completed successfully")
                 return ("Training completed successfully",)
             else:
-                self.log(f"LORA training failed with return code {return_code}", level="error")
+                self.log(f"FRESCO failed with return code {return_code}", level="error")
                 return (f"Training failed with return code {return_code}",)
         
         except Exception as e:
-            self.log(f"An error occurred during LORA training: {str(e)}", level="error")
+            self.log(f"An error occurred during FRESCO: {str(e)}", level="error")
             return (f"Error occurred: {str(e)}",)
                 
 
