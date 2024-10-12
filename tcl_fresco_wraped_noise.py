@@ -194,10 +194,10 @@ class TclFrescoWrapedNoise:
         # subprocess.run(command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd="/workspace/FRESCO-wraped-noise")
         self.log(f"Starting Fresco Wraped Noise training with command: {command}")
 
-        if os.path.exists(yaml_file):
-            self.log(f"file {yaml_file} exist")
+        if os.path.exists(config_path):
+            self.log(f"file {config_path} exist")
         else:
-            self.log(f"file {yaml_file} not exist")
+            self.log(f"file {config_path} not exist")
 
         try:
             process = subprocess.Popen(
