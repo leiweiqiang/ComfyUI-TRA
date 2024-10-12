@@ -158,7 +158,7 @@ class TclFresco:
             config_path
         ]
 
-        self.log(f"Starting Fresco training with command: {" ".join(command)}")
+        self.log(f"Starting Fresco training with command: {' '.join(command)}")
 
         try:
             process = subprocess.Popen(

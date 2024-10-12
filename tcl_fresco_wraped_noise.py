@@ -199,7 +199,7 @@ class TclFrescoWrapedNoise:
             config_path
         ]
 
-        self.log(f"Starting Fresco Wraped Noise training with command: {" ".join(command)}")
+        self.log(f"Starting Fresco Wraped Noise training with command: {' '.join(command)}")
 
         try:
             process = subprocess.Popen(
