@@ -153,10 +153,10 @@ class TclFresco:
         # subprocess.run(command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd="/workspace/FRESCO-main")
         self.log(f"Starting Fresco training with command: {command}")
 
-        if os.path.exists(config_path):
-            self.log(f"file {config_path} exist")
+        if os.path.exists("/workspace/FRESCO-main/run_fresco_updated.py"):
+            self.log(f"file exist")
         else:
-            self.log(f"file {config_path} not exist")
+            self.log(f"file not exist")
 
         try:
             process = subprocess.Popen(
