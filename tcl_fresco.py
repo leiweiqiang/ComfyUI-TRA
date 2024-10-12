@@ -7,7 +7,7 @@ import requests
 from server import PromptServer
 import concurrent.futures
 
-class TclLoraTraining:
+class TclFresco:
     def __init__(self):
         self.logger = logging.getLogger(__name__)
         self.prompt_server = PromptServer.instance
