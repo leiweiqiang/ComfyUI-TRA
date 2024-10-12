@@ -6,7 +6,6 @@ import logging
 import requests
 from server import PromptServer
 import concurrent.futures
-import time
 
 class TclFrescoWrapedNoise:
 
@@ -195,8 +194,12 @@ class TclFrescoWrapedNoise:
         # subprocess.run(command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd="/workspace/FRESCO-wraped-noise")
         self.log(f"Starting Fresco Wraped Noise training with command: {command}")
 
+        if os.path.exists(yaml_file):
+            self.log(f"file {yaml_file} exist")
+        else:
+            self.log(f"file {yaml_file} not exist")
+
         try:
-            time.sleep(0.5)
             process = subprocess.Popen(
                 command,
                 stdout=subprocess.PIPE,
