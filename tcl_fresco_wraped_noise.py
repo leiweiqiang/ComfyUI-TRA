@@ -207,7 +207,7 @@ class TclFrescoWrapedNoise:
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 text=True,
-                cwd="/workspace/FRESCO-wraped-noise"
+                cwd="/workspace/FRESCO-wraped-noise",
                 env=env
             )
             
