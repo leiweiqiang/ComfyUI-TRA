@@ -40,9 +40,10 @@ class TclLoraFluxGenDatasets:
         save_caption(raw_captions, raw_images_dir, id, base_dir)
         
         output_dir = os.path.join(base_dir, id, "output")
-        multidatabackend_path = os.path.join(base_dir, id, "multidatabackend.json")
+        config_dir = os.path.join("/product-lora-script", "config")
+        multidatabackend_path = os.path.join(config_dir, "multidatabackend.json")
         save_toml(multidatabackend, multidatabackend_path)
-        config_path = os.path.join(base_dir, id, "config.json")
+        config_path = os.path.join(config_dir, "config.json")
         save_toml(config, config_path)
         
         return config_path, output_dir, id,
