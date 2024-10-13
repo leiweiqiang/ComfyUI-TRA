@@ -6,6 +6,8 @@ import torch
 import numpy as np
 from torchvision.utils import save_image
 import logging
+import toml
+import json
 
 
 class TclLoraFluxGenDatasets:
@@ -42,8 +44,8 @@ class TclLoraFluxGenDatasets:
         output_dir = os.path.join(base_dir, id, "output")
         config_dir = os.path.join("/product-lora-script", "config")
         multidatabackend_path = os.path.join(config_dir, "multidatabackend.json")
-        save_toml(multidatabackend, multidatabackend_path)
-        config_path = os.path.join(config_dir, "config.json")
+        save_json(multidatabackend, multidatabackend_path)
+        config_path = os.path.join(config_dir, "config.env")
         save_toml(config, config_path)
         
         return config_path, output_dir, id,
@@ -60,8 +62,27 @@ def save_caption(images, path, id, base_dir):
     for index, caption in enumerate(images_list):
         output_path = os.path.join(base_dir, id, path, f"{index:04d}.txt")
         with open(output_path, 'w', encoding='utf-8') as file:
-            file.write(caption)
+            file.write(caption)          
 
-def save_toml(toml, toml_path):
+def save_toml(data, toml_path):
+    toml_dict = {}
+    for line in data.split('\n'):
+        if line.startswith('export '):
+            key, value = line[7:].split('=', 1)
+            toml_dict[key] = value.strip("'")
+    
     with open(toml_path, 'w', encoding='utf-8') as file:
-        file.write(toml)
+        toml.dump(toml_dict, file)
+
+def save_json(json_string, file_path):
+    try:
+        data = json.loads(json_string)
+        
+        with open(file_path, 'w', encoding='utf-8') as file:
+            json.dump(data, file, ensure_ascii=False, indent=4)
+        
+        print(f"JSON data successfully saved to {file_path}")
+    except json.JSONDecodeError as e:
+        print(f"Error decoding JSON: {e}")
+    except IOError as e:
+        print(f"Error writing to file: {e}")        
