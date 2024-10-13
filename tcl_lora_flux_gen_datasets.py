@@ -74,7 +74,7 @@ def save_toml(data, toml_path):
     with open(toml_path, 'w', encoding='utf-8') as file:
         toml.dump(toml_dict, file)
 
-def save_formatted_json(json_string, file_path):
+def save_json(json_string, file_path):
     try:
         json_string = json_string.strip('"')
         data = json.loads(json_string)
