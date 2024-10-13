@@ -86,8 +86,8 @@ def save_json(json_string, file_path):
         if json_string.startswith('"') and json_string.endswith('"'):
             json_string = json_string[1:-1]
         
-        # Replace escaped double quotes with actual double quotes
-        json_string = json_string.replace('\\"', '"')
+        # Replace '\\n' with actual newlines
+        json_string = json_string.replace('\\n', '\n')
         
         # Print the processed JSON string for debugging
         print("Processed JSON string:")
