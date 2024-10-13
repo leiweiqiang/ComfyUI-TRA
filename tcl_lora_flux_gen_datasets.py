@@ -76,12 +76,26 @@ def save_toml(data, toml_path):
 
 def save_json(json_string, file_path):
     try:
+        # Remove leading and trailing whitespace
         json_string = json_string.strip()
+        
+        # Remove any potential Byte Order Mark (BOM)
+        json_string = json_string.lstrip('\ufeff')
+        
+        # Remove leading and trailing double quotes if present
         if json_string.startswith('"') and json_string.endswith('"'):
             json_string = json_string[1:-1]
+        
+        # Replace escaped double quotes with actual double quotes
         json_string = json_string.replace('\\"', '"')
+        
+        # Print the processed JSON string for debugging
         print("Processed JSON string:")
         print(json_string)
+        
+        # Print the first few characters of the string as their ASCII values
+        print("ASCII values of the first 10 characters:")
+        print([ord(c) for c in json_string[:10]])
         data = json.loads(json_string)
         with open(file_path, 'w', encoding='utf-8') as file:
             json.dump(data, file, ensure_ascii=False, indent=4)
