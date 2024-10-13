@@ -86,12 +86,13 @@ def save_json(json_string, file_path):
         if json_string.startswith('"') and json_string.endswith('"'):
             json_string = json_string[1:-1]
         
-        # Replace '\n' with actual newlines and '\t' with actual tabs
-        json_string = json_string.replace('\\n', '\n').replace('\\t', '\t')
+        # Replace escaped double quotes with actual double quotes
+        json_string = json_string.replace('\\"', '"')
         
         # Print the processed JSON string for debugging
         print("Processed JSON string:")
         print(json_string)
+
         data = json.loads(json_string)
         with open(file_path, 'w', encoding='utf-8') as file:
             json.dump(data, file, ensure_ascii=False, indent=4)
