@@ -84,7 +84,7 @@ def save_json(json_string, file_path):
         
         if json_string.startswith('"') and json_string.endswith('"'):
             json_string = json_string[1:-1]
-        
+        json_string.replace('\\"', '"')
         print(json_string)
   
 
