@@ -153,7 +153,9 @@ class TclLoraFluxTraining:
         self.prompt_id = TRAINING_SET
 
         command = [
-            'bash', 'train.sh'
+            'bash',
+            '-c',
+            'source .venv/bin/activate && bash train.sh'
         ]
 
         self.log(f"Starting LoRA Flux training with command: {' '.join(command)}")
