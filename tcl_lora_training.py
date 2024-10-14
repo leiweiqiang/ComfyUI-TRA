@@ -127,12 +127,12 @@ class TclLoraTraining:
             return_code = process.poll()
             
             if return_code == 0:
-                self.log("LORA training completed successfully")
+                # self.log("LORA training completed successfully")
                 return ("Training completed successfully",)
             else:
-                self.log(f"LORA training failed with return code {return_code}", level="error")
+                # self.log(f"LORA training failed with return code {return_code}", level="error")
                 return (f"Training failed with return code {return_code}",)
         
         except Exception as e:
-            self.log(f"An error occurred during LORA training: {str(e)}", level="error")
+            # self.log(f"An error occurred during LORA training: {str(e)}", level="error")
             return (f"Error occurred: {str(e)}",)
