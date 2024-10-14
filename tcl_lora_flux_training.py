@@ -61,11 +61,10 @@ class TclLoraFluxTraining:
         data = {
             "message": message,
             "level": level,
-            "name": "LORA_FLUX_Training",
+            "name": "LORA_Training",
             "prompt_id": self.prompt_id
         }
-        self.prompt_server.send_sync("lora_flux_training_log", data)
-
+        self.prompt_server.send_sync("lora_training_log", data)
         # Send the log data asynchronously
         with concurrent.futures.ThreadPoolExecutor() as executor:
             executor.submit(self.send_log_data, data)
@@ -149,37 +148,33 @@ class TclLoraFluxTraining:
 
         process.wait()
 
-    def training(self, DATASET_CONFIG, OUTPUT_DIR, TRAINING_SET, seed):
-        """Main training function."""
-        if not self.ensure_directory_exists(OUTPUT_DIR):
-            return ("Failed to create output directory",)
 
+    def training(self, DATASET_CONFIG, OUTPUT_DIR, TRAINING_SET, seed):
         self.prompt_id = TRAINING_SET
 
-        # Construct the command for the training script
         command = [
             'bash', 'train.sh'
         ]
 
         self.log(f"Starting LoRA Flux training with command: {' '.join(command)}")
 
-        if not self.start_file_monitoring(OUTPUT_DIR):
-            return ("Failed to start file monitoring",)
-
         try:
-            # Start the training process
             process = subprocess.Popen(
                 command,
                 stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
                 text=True,
-                bufsize=1,
-                cwd="/sd-scripts-mask"
+                cwd="/product-lora-script"
             )
-
-            self.process_output(process)
-
-            return_code = process.returncode
+            
+            while True:
+                output = process.stdout.readline()
+                if output == '' and process.poll() is not None:
+                    break
+                if output:
+                    self.log(output.strip())
+            
+            return_code = process.poll()
             
             if return_code == 0:
                 self.log("LoRA Flux training completed successfully")
@@ -191,5 +186,3 @@ class TclLoraFluxTraining:
         except Exception as e:
             self.log(f"An error occurred during LoRA Flux training: {str(e)}", level="error")
             return (f"Error occurred: {str(e)}",)
-        finally:
-            self.stop_file_monitoring()

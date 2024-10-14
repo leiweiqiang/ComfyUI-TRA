@@ -65,30 +65,16 @@ def save_caption(images, path, id, base_dir):
             file.write(caption)          
 
 def save_toml(data, toml_path):
-    toml_dict = {}
-    for line in data.split('\n'):
-        if line.startswith('export '):
-            key, value = line[7:].split('=', 1)
-            toml_dict[key] = value.strip("'")
-    
+    print(data)
     with open(toml_path, 'w', encoding='utf-8') as file:
-        toml.dump(toml_dict, file)
+        file.write(data)
 
 def save_json(json_string, file_path):
     try:
-        json_string = json_string.replace('\\n', '')
-        
-        json_string = json_string.strip()
-        
-        json_string = json_string.lstrip('\ufeff')
-        
-        if json_string.startswith('"') and json_string.endswith('"'):
-            json_string = json_string[1:-1]
-        json_string.replace('\\"', '"')
         print(json_string)
-  
-
         data = json.loads(json_string)
+        print(type(data))  # 应该输出 <class 'list'>
+        print(len(data)) 
         with open(file_path, 'w', encoding='utf-8') as file:
             json.dump(data, file, ensure_ascii=False, indent=4)
         
