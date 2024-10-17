@@ -19,8 +19,8 @@ class TclFrescoWrapedNoise:
         return {
             'required': {
                 "model_type": (["XL", "kolors"],),
-                "controlnet_type_xl": (["canny-xl", "depth-xl", "mistoline-xl", "canny+depth-xl", "mistoline+depth-xl"]),
-                "controlnet_type_kolors": (["canny-kolors", "depth-kolors", "canny+depth-kolors"]),
+                "controlnet_type_xl": (["canny-xl", "depth-xl", "mistoline-xl", "canny+depth-xl", "mistoline+depth-xl"],),
+                "controlnet_type_kolors": (["canny-kolors", "depth-kolors", "canny+depth-kolors"],),
                 "controlnet_strength": ("FLOAT", {"default": 0.5, "min": 0.3, "max": 1.0}),
                 "ip_adapter_scale": ("FLOAT", {"default": 0.3, "min": 0.3, "max": 0.9}),
                 "max_images": ("INT", {"default": 3, "min": 3, "max": 200}),
