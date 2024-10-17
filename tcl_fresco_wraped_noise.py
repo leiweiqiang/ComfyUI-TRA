@@ -165,11 +165,12 @@ class TclFrescoWrapedNoise:
         env = os.environ.copy()
         env['PYTORCH_CUDA_ALLOC_CONF'] = 'max_split_size_mb:512'
 
+
         command = [
-            'python',
-            '/workspace/FRESCO_17_10_2024/run_fresco_updated.py',
-            '--config_path',
-            config_path
+            'bash',
+            '-c',
+            f'source /workspace/FRESCO_17_10_2024/.venv/bin/activate && '
+            f'python /workspace/FRESCO_17_10_2024/run_fresco_updated.py --config_path {config_path}'
         ]
 
         self.log(f"Starting Fresco Wraped Noise training with command: {' '.join(command)}")
