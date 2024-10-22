@@ -32,7 +32,7 @@ class TclFresco:
         }
 
     RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("help",)
+    RETURN_NAMES = ("help", "output_video", "keyframe_video", "combined_video", )
     FUNCTION = "fresco"
     OUTPUT_NODE = False
     CATEGORY = "TCL Research America"
@@ -181,10 +181,10 @@ class TclFresco:
             
             if return_code == 0:
                 self.log("FRESCO completed successfully")
-                return ("Training completed successfully",)
+                return ("FRESCO completed successfully", f"{save_path}/out.mp4", f"{save_path}/raw_keyframes.mp4", f"{save_path}/combined.mp4", )
             else:
                 self.log(f"FRESCO failed with return code {return_code}", level="error")
-                return (f"Training failed with return code {return_code}",)
+                return (f"FRESCO failed with return code {return_code}",)
         
         except Exception as e:
             self.log(f"An error occurred during FRESCO: {str(e)}", level="error")
