@@ -13,6 +13,7 @@ class TclFrescoWrapedNoise:
         self.prompt_server = PromptServer.instance
         self.api_url = "https://minestudio.tcl-research.us/api/lora_training_log"
         self.prompt_id = ""
+        self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=5)
 
     @classmethod
     def INPUT_TYPES(s):
@@ -56,19 +57,15 @@ class TclFrescoWrapedNoise:
         self.prompt_server.send_sync("fresco_wraped_noise_log", data)
 
         # Send the log data asynchronously
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            executor.submit(self.send_log_data, {"prompt_id": self.prompt_id, "message": message, "level": level})
+        self.executor.submit(self.send_log_data, {"prompt_id": self.prompt_id, "message": message, "level": level})
 
     def send_log_data(self, data):
         try:
             response = requests.post(self.api_url, json=data)
             if response.status_code != 200:
-                # self.logger.info("Log data sent successfully")
-            # else:
                 self.logger.error(f"Failed to send log data: {response.status_code} - {response.text}")
         except Exception as e:
             self.logger.error(f"Error sending log data: {str(e)}")
-
 
     def fresco(self, model_type, controlnet_type_xl, controlnet_type_kolors, controlnet_strength, ip_adapter_scale, max_images, prompt, negative, video_path, save_path, ref_img_ip_adapter, noise_type, ip_adapter_style_only, prompt_id):
         self.prompt_id = prompt_id
@@ -165,7 +162,6 @@ class TclFrescoWrapedNoise:
         env = os.environ.copy()
         env['PYTORCH_CUDA_ALLOC_CONF'] = 'max_split_size_mb:512'
 
-
         command = [
             'bash',
             '-c',
@@ -204,5 +200,6 @@ class TclFrescoWrapedNoise:
         except Exception as e:
             self.log(f"An error occurred during FRESCO WRAPED NOISE: {str(e)}", level="error")
             return (f"Error occurred: {str(e)}",)
-                
 
+    def __del__(self):
+        self.executor.shutdown(wait=False)
