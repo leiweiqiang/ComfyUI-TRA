@@ -36,7 +36,7 @@ class TclFrescoWrapedNoise:
             },
         }
 
-    RETURN_TYPES = ("STRING",)
+    RETURN_TYPES = ("STRING","STRING","STRING","STRING",)
     RETURN_NAMES = ("help", "output_video", "keyframe_video", "combined_video", )
     FUNCTION = "fresco"
     OUTPUT_NODE = False
