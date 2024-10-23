@@ -182,7 +182,7 @@ class TclFresco:
             
             if return_code == 0:
                 self.log("FRESCO completed successfully")
-                return ("FRESCO completed successfully", f"{folder_paths.get_input_directory()}/{save_path}/out.mp4", f"{folder_paths.get_input_directory()}/{save_path}/raw_keyframes.mp4", f"{folder_paths.get_input_directory()}/{save_path}/combined.mp4", )
+                return ("FRESCO completed successfully", f"{folder_paths.get_output_directory()}/{save_path}/out.mp4", f"{folder_paths.get_output_directory()}/{save_path}/raw_keyframes.mp4", f"{folder_paths.get_output_directory()}/{save_path}/combined.mp4", )
             else:
                 self.log(f"FRESCO failed with return code {return_code}", level="error")
                 return (f"FRESCO failed with return code {return_code}",)
